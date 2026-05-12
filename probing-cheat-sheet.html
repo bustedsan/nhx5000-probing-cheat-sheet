@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHX5000 Probing Cheat Sheet | DMG Mori Manual-Exact</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a2744,#0d1b2a);padding:20px 30px;border-bottom:2px solid #30363d}
+.header h1{color:#58a6ff;font-size:1.6rem;font-weight:700}
+.header .sub{color:#8b949e;font-size:.85rem;margin-top:4px}
+.machine-badge{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.badge{background:#21262d;border:1px solid #30363d;border-radius:12px;padding:3px 10px;font-size:.75rem;color:#8b949e}
+.badge.green{border-color:#238636;color:#3fb950}
+.badge.blue{border-color:#1f6feb;color:#58a6ff}
+.tabs{display:flex;background:#161b22;border-bottom:1px solid #30363d;overflow-x:auto;padding:0 20px}
+.tab{padding:12px 20px;cursor:pointer;border-bottom:2px solid transparent;color:#8b949e;font-size:.88rem;white-space:nowrap;transition:all .2s}
+.tab:hover{color:#c9d1d9}
+.tab.active{color:#58a6ff;border-bottom-color:#58a6ff}
+.content{display:none;padding:24px 30px;max-width:1400px;margin:0 auto}
+.content.active{display:block}
+.section-title{color:#58a6ff;font-size:1.1rem;font-weight:600;margin:20px 0 12px;border-left:3px solid #58a6ff;padding-left:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px}
+.card h3{color:#e6edf3;font-size:.95rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .icon{font-size:1rem}
+.code-block{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:12px;font-family:'Consolas','Courier New',monospace;font-size:.82rem;line-height:1.7;overflow-x:auto}
+.g{color:#79c0ff} .m{color:#ff7b72} .n{color:#ffa657} .cmt{color:#8b949e} .var{color:#d2a8ff} .num{color:#a5d6ff} .lit{color:#e6edf3}
+.param-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.82rem}
+.param-table th{background:#21262d;color:#8b949e;padding:6px 10px;text-align:left;border:1px solid #30363d}
+.param-table td{padding:6px 10px;border:1px solid #30363d;vertical-align:top}
+.param-table td:first-child{color:#ffa657;font-family:monospace;white-space:nowrap}
+.param-table td:nth-child(2){color:#79c0ff}
+.var-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.82rem}
+.var-table th{background:#21262d;color:#8b949e;padding:6px 10px;text-align:left;border:1px solid #30363d}
+.var-table td{padding:6px 10px;border:1px solid #30363d}
+.var-table td:first-child{color:#d2a8ff;font-family:monospace}
+.note{background:#1c2128;border-left:3px solid #d29922;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.82rem;color:#e3b341;margin:8px 0}
+.warn{background:#1c2128;border-left:3px solid #da3633;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.82rem;color:#ff7b72;margin:8px 0}
+.tip{background:#1c2128;border-left:3px solid #238636;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.82rem;color:#3fb950;margin:8px 0}
+.inline-code{background:#21262d;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:.85em;color:#79c0ff}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>&#9881; NHX5000 Probing Cheat Sheet</h1>
+<div class="sub">DMG Mori Automatic Measurement Manual &mdash; Exact Cycles &amp; Procedures</div>
+<div class="machine-badge">
+<span class="badge blue">DMG Mori NHX5000</span>
+<span class="badge blue">Fanuc 31i-B</span>
+<span class="badge green">Renishaw Spindle Probe</span>
+<span class="badge green">M144/M145 Probe ON/OFF</span>
+<span class="badge">Inch Units</span>
+<span class="badge">G320 / G370 Native Cycles</span>
+</div>
+</div>
+<div class="tabs">
+<div class="tab active" onclick="showTab('probe-setup')">&#128268; Probe Setup</div>
+<div class="tab" onclick="showTab('g320')">&#9654; G320 Measurement</div>
+<div class="tab" onclick="showTab('g370')">&#9654; G370 Reference Face</div>
+<div class="tab" onclick="showTab('g323')">&#9654; G323 Sensor Offset</div>
+<div class="tab" onclick="showTab('variables')">&#35; Variables #100-149</div>
+<div class="tab" onclick="showTab('tool-length')">&#128295; Tool Length</div>
+<div class="tab" onclick="showTab('tool-break')">&#9888; Tool Breakage</div>
+<div class="tab" onclick="showTab('tool-diam')">&#9004; Tool Diameter</div>
+<div class="tab" onclick="showTab('offset-write')">&#128221; Offset Writing</div>
+<div class="tab" onclick="showTab('ipi')">&#128200; In-Process</div>
+</div>
+<!-- TAB: PROBE SETUP -->
+<div id="probe-setup" class="content active">
+<div class="section-title">Probe Power &amp; Activation (DMG Mori Manual)</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#128268;</span>M144 / M145 — Probe ON/OFF</h3>
+<div class="code-block"><span class="cmt">( ACTIVATE SPINDLE PROBE )</span>
+<span class="m">M144</span>            <span class="cmt">( Probe Power ON — transmitter activated )</span>
+<span class="g">G4</span> <span class="n">P1.0</span>        <span class="cmt">( Dwell 1 sec — allow probe to initialize )</span>
+<span class="cmt">
+( ... probing cycle ... )
+
+( DEACTIVATE SPINDLE PROBE )</span>
+<span class="m">M145</span>            <span class="cmt">( Probe Power OFF )</span></div>
+<div class="note">M144 activates the spindle probe transmitter. Always dwell after M144 before calling any G320/G370 cycle. M145 deactivates. These are DMG Mori NHX5000 manual-specified M-codes.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128295;</span>Probe Orientation (Required)</h3>
+<div class="code-block"><span class="cmt">( ORIENT SPINDLE FOR PROBE USE )</span>
+<span class="m">M19</span>             <span class="cmt">( Spindle orient — align probe stylus )</span>
+<span class="m">M144</span>            <span class="cmt">( Probe ON )</span>
+<span class="g">G4</span> <span class="n">P1.0</span>        <span class="cmt">( Wait for probe ready )</span>
+<span class="g">G91</span> <span class="g">G28</span> <span class="n">Z0</span>    <span class="cmt">( Return to ref Z )</span></div>
+<div class="warn">Do NOT rotate spindle (S-code) while probe is installed. M19 orient only.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#9881;</span>Probe Setup Program Template</h3>
+<div class="code-block"><span class="n">O1000</span>          <span class="cmt">( PROBE SETUP PROGRAM )</span>
+<span class="g">G90</span> <span class="g">G94</span> <span class="g">G17</span>   <span class="cmt">( Absolute, feed/min, XY plane )</span>
+<span class="g">G20</span>             <span class="cmt">( Inch mode )</span>
+<span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>   <span class="cmt">( Cancel comp/TLC/canned )</span>
+<span class="m">T50</span> <span class="m">M6</span>         <span class="cmt">( Load probe — tool 50 typical )</span>
+<span class="m">M19</span>             <span class="cmt">( Spindle orient )</span>
+<span class="m">M144</span>           <span class="cmt">( Probe ON )</span>
+<span class="g">G4</span> <span class="n">P1.0</span>        <span class="cmt">( Dwell 1 sec )</span>
+<span class="cmt">( ... G320/G370 cycles here ... )</span>
+<span class="m">M145</span>           <span class="cmt">( Probe OFF )</span>
+<span class="g">G91</span> <span class="g">G28</span> <span class="n">Z0</span>    <span class="cmt">( Z home )</span>
+<span class="m">M30</span>             <span class="cmt">( Program end )</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>Probe Sensor — NHX5000 Info</h3>
+<table class="param-table">
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Probe Model</td><td>Renishaw Spindle Probe</td></tr>
+<tr><td>Part Number</td><td>2008019-0033</td></tr>
+<tr><td>Machine</td><td>DMG Mori NHX5000</td></tr>
+<tr><td>Control</td><td>Fanuc 31i-B Series B</td></tr>
+<tr><td>Probe ON M-code</td><td>M144</td></tr>
+<tr><td>Probe OFF M-code</td><td>M145</td></tr>
+<tr><td>Units</td><td>Inch (G20)</td></tr>
+<tr><td>Probe Cycles</td><td>G320, G370, G323</td></tr>
+<tr><td>Variable Range</td><td>#100 – #149</td></tr>
+</table>
+</div>
+</div>
+</div>
+<!-- TAB: G320 -->
+<div id="g320" class="content">
+<div class="section-title">G320 — Automatic Measurement Cycle (DMG Mori Native)</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#9654;</span>G320 Syntax — Full Format</h3>
+<div class="code-block"><span class="g">G320</span> <span class="n">X_</span> <span class="n">Y_</span> <span class="n">Z_</span> <span class="n">D_</span> <span class="n">F_</span> <span class="n">W_</span> <span class="n">Q_</span> <span class="n">L_</span> <span class="n">S_</span>
+
+<span class="cmt">( X  = Target X position )
+( Y  = Target Y position )
+( Z  = Target Z position )
+( D  = Measurement direction
+       1=+X  2=-X  3=+Y  4=-Y  5=+Z  6=-Z )
+( F  = Feed rate (in./min) )
+( W  = Work offset number to write result
+       e.g. W54 = G54, W55 = G55, etc. )
+( Q  = Axis to write offset (1=X 2=Y 3=Z) )
+( L  = Measurement distance (search stroke) )
+( S  = Skip signal selection )</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>G320 Parameter Reference</h3>
+<table class="param-table">
+<tr><th>Arg</th><th>Description</th><th>Typical</th></tr>
+<tr><td>X,Y,Z</td><td>Approach position before measuring</td><td>Part feature coordinate</td></tr>
+<tr><td>D</td><td>Probe direction: 1=+X, 2=-X, 3=+Y, 4=-Y, 5=+Z, 6=-Z</td><td>D1 thru D6</td></tr>
+<tr><td>F</td><td>Probing feed rate (in/min)</td><td>F5. to F20.</td></tr>
+<tr><td>W</td><td>Work offset to write (54–59, 54.1 etc.)</td><td>W54</td></tr>
+<tr><td>Q</td><td>Axis to update in work offset (1=X,2=Y,3=Z)</td><td>Q1/Q2/Q3</td></tr>
+<tr><td>L</td><td>Search distance / clearance stroke</td><td>L0.5</td></tr>
+<tr><td>S</td><td>Skip signal number</td><td>S1 (default)</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G320 — Measure X Origin (Single Surface)</h3>
+<div class="code-block"><span class="cmt">( SET G54 X-ZERO FROM PART EDGE )</span>
+<span class="m">M144</span>         <span class="cmt">( Probe ON )</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G90</span> <span class="g">G0</span>       <span class="cmt">( Absolute rapid )</span>
+<span class="g">G0</span> <span class="n">X-1.0</span> <span class="n">Y0.</span> <span class="n">Z0.5</span> <span class="cmt">( Approach safe position )</span>
+<span class="g">G320</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z0.5</span> <span class="n">D1</span> <span class="n">F10.</span> <span class="n">W54</span> <span class="n">Q1</span> <span class="n">L0.5</span>
+<span class="cmt">( G320 probes in +X direction, writes result
+  to G54 X offset automatically via W54 Q1 )</span>
+<span class="m">M145</span>         <span class="cmt">( Probe OFF )</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G320 — Measure Y Origin (Single Surface)</h3>
+<div class="code-block"><span class="cmt">( SET G54 Y-ZERO FROM PART FRONT FACE )</span>
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G0</span> <span class="n">X0.</span> <span class="n">Y-1.0</span> <span class="n">Z0.5</span>
+<span class="g">G320</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z0.5</span> <span class="n">D3</span> <span class="n">F10.</span> <span class="n">W54</span> <span class="n">Q2</span> <span class="n">L0.5</span>
+<span class="cmt">( D3 = probe in +Y direction
+  W54 Q2 = write to G54 Y offset )</span>
+<span class="m">M145</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G320 — Measure Z Surface</h3>
+<div class="code-block"><span class="cmt">( SET G54 Z-ZERO FROM TOP OF PART )</span>
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G0</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z1.0</span>
+<span class="g">G320</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z0.</span> <span class="n">D6</span> <span class="n">F5.</span> <span class="n">W54</span> <span class="n">Q3</span> <span class="n">L0.5</span>
+<span class="cmt">( D6 = probe in -Z direction
+  W54 Q3 = write to G54 Z offset )</span>
+<span class="m">M145</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G320 — Boss / Center X (Two Touches)</h3>
+<div class="code-block"><span class="cmt">( FIND CENTER OF BOSS IN X )
+( Touch -X side first )</span>
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G0</span> <span class="n">X-1.25</span> <span class="n">Y0.</span> <span class="n">Z-0.5</span>
+<span class="g">G320</span> <span class="n">D1</span> <span class="n">F10.</span> <span class="n">L1.0</span>
+<span class="var">#100</span><span class="lit">=</span><span class="var">#5001</span>   <span class="cmt">( Save +X touch in #100 )</span>
+
+<span class="cmt">( Touch +X side )</span>
+<span class="g">G0</span> <span class="n">X1.25</span>
+<span class="g">G320</span> <span class="n">D2</span> <span class="n">F10.</span> <span class="n">L1.0</span>
+<span class="var">#101</span><span class="lit">=</span><span class="var">#5001</span>   <span class="cmt">( Save -X touch in #101 )</span>
+
+<span class="var">#102</span><span class="lit">=[</span><span class="var">#100</span><span class="lit">+</span><span class="var">#101</span><span class="lit">]/2</span>  <span class="cmt">( Calc center )</span>
+<span class="g">G10</span> <span class="n">L2</span> <span class="n">P1</span> <span class="n">X</span><span class="var">#102</span>   <span class="cmt">( Write center to G54 X )</span>
+<span class="m">M145</span></div>
+<div class="tip">#5001 = last measurement result variable (Fanuc Macro B).</div>
+</div>
+</div>
+</div>
+<!-- TAB: G370 -->
+<div id="g370" class="content">
+<div class="section-title">G370 — Reference Face Measurement (DMG Mori Native)</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#9654;</span>G370 Syntax</h3>
+<div class="code-block"><span class="g">G370</span> <span class="n">X_</span> <span class="n">Y_</span> <span class="n">Z_</span> <span class="n">D_</span> <span class="n">F_</span> <span class="n">W_</span> <span class="n">Q_</span> <span class="n">L_</span>
+
+<span class="cmt">( G370: measures from a reference surface.
+  Used to update offsets relative to
+  a known reference (master) position.
+  D = direction same as G320:
+  1=+X  2=-X  3=+Y  4=-Y  5=+Z  6=-Z
+  W = work offset to update
+  Q = axis (1=X  2=Y  3=Z) )</span></div>
+<div class="note">G370 is used when you need to re-reference to a datum surface rather than set an absolute zero. The cycle measures the surface and updates the offset relative to the reference point stored from the G323 sensor offset calibration.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G370 — Re-Reference Z from Datum Surface</h3>
+<div class="code-block"><span class="cmt">( RE-REFERENCE Z FROM FIXTURE DATUM PAD )</span>
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G0</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z1.0</span>
+<span class="g">G370</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z0.1</span> <span class="n">D6</span> <span class="n">F5.</span> <span class="n">W54</span> <span class="n">Q3</span> <span class="n">L0.5</span>
+<span class="cmt">( Probes down -Z, updates G54 Z offset
+  relative to calibrated sensor reference )</span>
+<span class="m">M145</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G370 — Re-Reference X from Datum</h3>
+<div class="code-block"><span class="cmt">( RE-REFERENCE X FROM FIXTURE SIDE PAD )</span>
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G0</span> <span class="n">X-1.0</span> <span class="n">Y0.</span> <span class="n">Z0.</span>
+<span class="g">G370</span> <span class="n">X-0.5</span> <span class="n">Y0.</span> <span class="n">Z0.</span> <span class="n">D1</span> <span class="n">F10.</span> <span class="n">W54</span> <span class="n">Q1</span> <span class="n">L0.5</span>
+<span class="cmt">( Probes +X to datum, updates G54 X )</span>
+<span class="m">M145</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>G320 vs G370 — When to Use</h3>
+<table class="param-table">
+<tr><th>Cycle</th><th>Purpose</th><th>Use Case</th></tr>
+<tr><td>G320</td><td>Absolute measurement</td><td>Set work zero from raw part surface</td></tr>
+<tr><td>G370</td><td>Reference surface measurement</td><td>Re-datum to known fixture surface</td></tr>
+<tr><td>G323</td><td>Sensor offset calibration</td><td>Calibrate probe tip vs table sensor</td></tr>
+</table>
+</div>
+</div>
+</div>
+<!-- TAB: G323 -->
+<div id="g323" class="content">
+<div class="section-title">G323 — Sensor Offset Calibration (DMG Mori Native)</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#9654;</span>G323 Syntax</h3>
+<div class="code-block"><span class="g">G323</span> <span class="n">F_</span> <span class="n">L_</span>
+
+<span class="cmt">( G323: Calibrates spindle probe tip offset
+  using the table-mounted reference tool
+  sensor (TLS/reference sphere).
+  F = probing feed rate
+  L = search stroke distance
+  Result stored in machine parameters / probe offset register )</span></div>
+<div class="note">Run G323 whenever the probe is changed, stylus is swapped, or after any crash. This establishes the probe tip position relative to machine coordinates. Must be run before G320/G370 cycles produce accurate results.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>G323 — Probe Calibration Routine</h3>
+<div class="code-block"><span class="cmt">( PROBE CALIBRATION — RUN AFTER PROBE INSTALL )</span>
+<span class="n">O0999</span>
+<span class="g">G90</span> <span class="g">G20</span>
+<span class="m">T50</span> <span class="m">M6</span>       <span class="cmt">( Load probe )</span>
+<span class="m">M19</span>           <span class="cmt">( Spindle orient )</span>
+<span class="m">M144</span>         <span class="cmt">( Probe ON )</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="cmt">( Position over table reference sensor )</span>
+<span class="g">G0</span> <span class="n">X[table_sensor_X]</span> <span class="n">Y[table_sensor_Y]</span> <span class="n">Z1.0</span>
+<span class="g">G323</span> <span class="n">F5.</span> <span class="n">L0.5</span>
+<span class="cmt">( Stores probe offset in machine register )</span>
+<span class="m">M145</span>         <span class="cmt">( Probe OFF )</span>
+<span class="g">G91</span> <span class="g">G28</span> <span class="n">Z0</span>
+<span class="m">M30</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#9888;</span>G323 — When to Run</h3>
+<div class="warn">ALWAYS run G323 calibration after:<br>&#8226; Installing or re-installing the probe<br>&#8226; Replacing probe stylus<br>&#8226; Any probe crash or over-travel<br>&#8226; Machine startup / power-on sequence<br>&#8226; Any change to probe tool offset (T50)</div>
+<div class="tip">Store the G323 calibration run as a sub-program and call it as part of your setup macro before any G320/G370 measurement cycles.</div>
+</div>
+</div>
+</div>
+<!-- TAB: VARIABLES -->
+<div id="variables" class="content">
+<div class="section-title">Variables #100–#149 — DMG Mori NHX5000 Common Variables</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#35;</span>Variable Assignments (Manual-Based)</h3>
+<table class="var-table">
+<tr><th>Variable</th><th>Description</th><th>Notes</th></tr>
+<tr><td>#100</td><td>Measurement result 1 / X surface touch</td><td>G320 result capture</td></tr>
+<tr><td>#101</td><td>Measurement result 2 / X2 or Y touch</td><td>Bi-directional center calc</td></tr>
+<tr><td>#102</td><td>Calculated center / computed value</td><td>([#100+#101]/2)</td></tr>
+<tr><td>#103</td><td>Measurement result 3</td><td>Third touch or Z</td></tr>
+<tr><td>#104</td><td>Measured diameter / width</td><td>#101-#100</td></tr>
+<tr><td>#105</td><td>Error / deviation from nominal</td><td>Compare to tolerance</td></tr>
+<tr><td>#110</td><td>Nominal dimension (set by programmer)</td><td>Input value</td></tr>
+<tr><td>#111</td><td>Tolerance +</td><td>Input value</td></tr>
+<tr><td>#112</td><td>Tolerance -</td><td>Input value</td></tr>
+<tr><td>#120</td><td>Tool length measurement result</td><td>From TLS cycle</td></tr>
+<tr><td>#121</td><td>Tool length nominal</td><td>Programmer set</td></tr>
+<tr><td>#122</td><td>Tool length deviation</td><td>#120-#121</td></tr>
+<tr><td>#130</td><td>Tool diameter measurement result</td><td>From TLS diameter cycle</td></tr>
+<tr><td>#131</td><td>Tool diameter nominal</td><td>Programmer set</td></tr>
+<tr><td>#132</td><td>Tool diameter deviation</td><td>#130-#131</td></tr>
+<tr><td>#140</td><td>General scratch / temp variable</td><td>Safe for calculation</td></tr>
+<tr><td>#141</td><td>General scratch / temp variable</td><td>Safe for calculation</td></tr>
+<tr><td>#149</td><td>General scratch / status flag</td><td>0=OK, 1=Alarm</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>Fanuc Macro B System Variables (Reference)</h3>
+<table class="var-table">
+<tr><th>Variable</th><th>Description</th></tr>
+<tr><td>#5001</td><td>Last skip signal X position (probe touch X)</td></tr>
+<tr><td>#5002</td><td>Last skip signal Y position (probe touch Y)</td></tr>
+<tr><td>#5003</td><td>Last skip signal Z position (probe touch Z)</td></tr>
+<tr><td>#5021</td><td>Current X machine position</td></tr>
+<tr><td>#5022</td><td>Current Y machine position</td></tr>
+<tr><td>#5023</td><td>Current Z machine position</td></tr>
+<tr><td>#2001–2048</td><td>Tool length offsets H1–H48</td></tr>
+<tr><td>#2201–2248</td><td>Tool radius/wear offsets D1–D48</td></tr>
+<tr><td>#5221–5320</td><td>Work offsets G54–G59 and extended</td></tr>
+</table>
+<div class="note">#5001/#5002/#5003 capture the machine position at the moment of probe trigger — these are the key variables for manual result capture when not using W/Q auto-write.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#9881;</span>Variable Usage Example</h3>
+<div class="code-block"><span class="cmt">( CAPTURE AND VALIDATE MEASUREMENT )</span>
+<span class="var">#110</span><span class="lit">=</span><span class="num">2.500</span>     <span class="cmt">( Nominal width 2.500" )</span>
+<span class="var">#111</span><span class="lit">=</span><span class="num">0.002</span>     <span class="cmt">( Tol + )</span>
+<span class="var">#112</span><span class="lit">=</span><span class="num">0.002</span>     <span class="cmt">( Tol - )</span>
+
+<span class="cmt">( After G320 touches, grab results )</span>
+<span class="var">#100</span><span class="lit">=</span><span class="var">#5001</span>    <span class="cmt">( Touch 1 X )</span>
+<span class="var">#101</span><span class="lit">=</span><span class="var">#5001</span>    <span class="cmt">( Touch 2 X [after re-approach] )</span>
+<span class="var">#104</span><span class="lit">=[</span><span class="var">#101</span><span class="lit">-</span><span class="var">#100</span><span class="lit">]</span>  <span class="cmt">( Measured width )</span>
+<span class="var">#105</span><span class="lit">=[</span><span class="var">#104</span><span class="lit">-</span><span class="var">#110</span><span class="lit">]</span>  <span class="cmt">( Deviation )</span>
+
+<span class="cmt">( Check tolerance )</span>
+<span class="g">IF</span> <span class="lit">[ABS[</span><span class="var">#105</span><span class="lit">] GT </span><span class="var">#111</span><span class="lit">]</span> <span class="g">GOTO</span> <span class="num">9999</span>
+<span class="cmt">( ... continue machining ... )</span>
+<span class="g">GOTO</span> <span class="num">9998</span>
+<span class="n">N9999</span> <span class="cmt">( OUT OF TOLERANCE — ALARM )</span>
+<span class="var">#3000</span><span class="lit">=</span><span class="num">101</span> <span class="lit">(PART OUT OF TOLERANCE)</span>
+<span class="n">N9998</span></div>
+</div>
+</div>
+</div>
