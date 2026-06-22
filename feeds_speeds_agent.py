@@ -190,18 +190,99 @@ def print_table_all():
     print(SEP2)
 
 
+# ── REPL ──────────────────────────────────────────────────────────────────────
+HELP_TEXT = """
+Commands:
+  table                        full table — all tools at recommended starts
+  list                         list tool keys
+  <key>                        detail for one tool at recommended SFM/IPT
+  <key> <SFM> <IPT>            detail with custom values
+  calc <dia> <Z> <SFM> <IPT>   raw RPM/IPM for any cutter
+  help                         show this message
+  quit / exit                  exit
+
+Tool keys:  sandvik_1in  sandvik_2in  kennametal_1in  seco_1in  iscar_1in
+            sandvik_345_3in  sandvik_345_3in_8z  seco_r220_3in
+            kennametal_dodeka_3in_5z  kennametal_dodeka_3in_8z
+"""
+
+def repl():
+    print(SEP2)
+    print("  Feeds & Speeds Agent — NHX5000 / 13-8 PH Stainless")
+    print("  Type 'help' for commands, 'table' for full summary, 'quit' to exit.")
+    print(SEP2)
+
+    while True:
+        try:
+            raw = input("\n> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nExit.")
+            break
+
+        if not raw:
+            continue
+
+        tokens = raw.split()
+        cmd = tokens[0].lower()
+
+        if cmd in ("quit", "exit", "q"):
+            print("Exit.")
+            break
+
+        elif cmd in ("help", "?"):
+            print(HELP_TEXT)
+
+        elif cmd in ("table", "all"):
+            print_table_all()
+
+        elif cmd in ("list", "ls"):
+            print()
+            for k, t in TOOLS.items():
+                print(f"  {k:<32}  {t['label']}")
+
+        elif cmd == "calc":
+            if len(tokens) < 5:
+                print("  Usage: calc <dia_in> <Z> <SFM> <IPT>")
+                continue
+            try:
+                d, z, sfm, ipt = float(tokens[1]), int(tokens[2]), float(tokens[3]), float(tokens[4])
+                rpm, ipm = calc(d, z, sfm, ipt)
+                print(f"\n  Dia={d}\"  Z={z}  SFM={sfm}  IPT={ipt}")
+                print(f"  RPM = {rpm:.0f}   IPM = {ipm:.1f}")
+            except ValueError:
+                print("  Invalid numbers.")
+
+        elif cmd in TOOLS:
+            sfm = float(tokens[1]) if len(tokens) > 1 else None
+            ipt = float(tokens[2]) if len(tokens) > 2 else None
+            print_tool(cmd, sfm, ipt)
+            print(SEP)
+
+        else:
+            # fuzzy match on label
+            matches = [k for k in TOOLS if cmd in k]
+            if matches:
+                print(f"  Did you mean: {', '.join(matches)} ?")
+            else:
+                print(f"  Unknown command '{cmd}'. Type 'help' or 'list'.")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     args = sys.argv[1:]
 
+    # No args → interactive REPL
     if not args:
-        print_table_all()
+        repl()
         return
 
     if args[0] in ("--list", "-l", "list"):
-        print("\nAvailable tool keys:")
         for k, t in TOOLS.items():
-            print(f"  {k:<30}  {t['label']}  ({t['brand']})")
+            print(f"  {k:<32}  {t['label']}  ({t['brand']})")
+        return
+
+    if args[0] in ("--table", "-t", "table"):
+        print_table_all()
         return
 
     key = args[0]
@@ -211,7 +292,6 @@ def main():
 
     sfm = float(args[1]) if len(args) > 1 else None
     ipt = float(args[2]) if len(args) > 2 else None
-
     print_tool(key, sfm, ipt)
     print(SEP)
 
