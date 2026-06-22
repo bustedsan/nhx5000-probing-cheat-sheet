@@ -427,15 +427,17 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 
 <!-- CUTTING DATA -->
 <div class="card">
-<h3><span class="icon">&#128200;</span>Starting Cutting Data — 13-8 PH Shoulder Milling</h3>
+<h3><span class="icon">&#128200;</span>Starting Cutting Data — Sandvik CoroMill 390, 13-8 PH</h3>
+<div class="note" style="margin-bottom:8px">Formula: RPM = (Vc × 12) / (π × D) &nbsp;|&nbsp; IPM = fz × Z × RPM</div>
 <table class="param-table">
-<tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
-<tr><td>Surface speed (Vc)</td><td><span class="num">100–150 SFM</span></td><td>Conservative for PH grades; increase with flood coolant</td></tr>
-<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.003 IPT</span></td><td>Stay positive — no dwell in cut</td></tr>
-<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.250&quot;</span></td><td>Minimum 0.125&quot; shoulder milling</td></tr>
-<tr><td>Radial DOC (ae)</td><td><span class="num">50–75% dia</span></td><td>0.500–0.750&quot; for 1&quot; cutter</td></tr>
-<tr><td>Coolant</td><td><span class="num">Flood</span></td><td>Required — prevents work hardening from heat buildup</td></tr>
-<tr><td>Spindle RPM</td><td><span class="num">~380–575 RPM</span></td><td>@ 100–150 SFM on 1&quot; dia</td></tr>
+<tr><th>Parameter</th><th>1&quot; body (2 inserts)</th><th>2&quot; body (5 inserts)</th></tr>
+<tr><td>Surface speed (Vc)</td><td><span class="num">100–150 SFM</span></td><td><span class="num">100–150 SFM</span></td></tr>
+<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.003 IPT</span></td><td><span class="num">0.002–0.003 IPT</span></td></tr>
+<tr><td>Spindle RPM</td><td><span class="num">382–573 RPM</span></td><td><span class="num">191–286 RPM</span></td></tr>
+<tr><td><strong>Feed rate (IPM)</strong></td><td><span class="num" style="color:#3fb950;font-weight:700">1.5–3.4 IPM</span></td><td><span class="num" style="color:#3fb950;font-weight:700">1.9–4.3 IPM</span></td></tr>
+<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.250&quot;</span></td><td><span class="num">0.125–0.250&quot;</span></td></tr>
+<tr><td>Radial DOC (ae)</td><td><span class="num">50–75% dia</span></td><td><span class="num">40–60% dia</span></td></tr>
+<tr><td>Coolant</td><td colspan="2"><span class="num">Flood — required</span></td></tr>
 </table>
 <div class="warn">Never dwell or feed-hold in cut. 13-8 work-hardens instantly at the cut interface — any pause builds a hardened layer that can chip the insert on re-entry.</div>
 </div>
@@ -467,16 +469,19 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <tr><td>Max DOC (ap)</td><td><span class="num">0.157&quot; (4 mm)</span></td><td>Tight — only 32% above 0.125&quot; floor</td></tr>
 <tr><td>Shank</td><td><span class="num">Weldon / C-lock</span></td><td>Standard Weldon flat on shank</td></tr>
 </table>
-<div class="section-title" style="font-size:.85rem;margin:10px 0 6px">Starting Cuts — 13-8 PH Stainless</div>
+<div class="section-title" style="font-size:.85rem;margin:10px 0 6px">Starting Cuts — 13-8 PH Stainless (5 inserts, 1.000&quot; dia)</div>
+<div class="note" style="margin-bottom:8px">RPM = (Vc × 12) / (π × 1.000) &nbsp;|&nbsp; IPM = fz × 5 × RPM</div>
 <table class="param-table">
 <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
-<tr><td>Surface speed (Vc)</td><td><span class="num">300–450 SFM</span></td><td>Derate from nominal 560 SFM (ordinary stainless) for PH hardness</td></tr>
+<tr><td>Surface speed (Vc)</td><td><span class="num">300–450 SFM</span></td><td>Derated from nominal 560 SFM for PH hardness</td></tr>
+<tr><td>Spindle RPM</td><td><span class="num">1,146–1,719 RPM</span></td><td>@ 300–450 SFM on 1&quot; dia</td></tr>
 <tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.003 IPT</span></td><td>Stay positive — no dwell in cut</td></tr>
-<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.140&quot;</span></td><td>Stay ≤0.140&quot; to leave margin below 0.157&quot; max</td></tr>
+<tr><td><strong>Feed rate (IPM)</strong></td><td><span class="num" style="color:#3fb950;font-weight:700">11.5–25.8 IPM</span></td><td>Low: 0.002×5×1146 &nbsp;High: 0.003×5×1719</td></tr>
+<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.140&quot;</span></td><td>Stay ≤0.140&quot; — margin below 0.157&quot; max</td></tr>
 <tr><td>Radial DOC (ae)</td><td><span class="num">50–70% dia</span></td><td>0.500–0.700&quot; for 1&quot; cutter</td></tr>
 <tr><td>Coolant</td><td><span class="num">Flood</span></td><td>Required for 13-8 PH</td></tr>
 </table>
-<div class="warn">Max DOC is 0.157&quot; — run ≤0.140&quot; on 13-8 to maintain safety margin as insert wears. If DOC > 0.125&quot; is needed regularly, consider Iscar E90A (0.394&quot; max DOC) below.</div>
+<div class="warn">Max DOC is 0.157&quot; — run ≤0.140&quot; on 13-8 to maintain safety margin as insert wears. If DOC > 0.140&quot; is needed regularly, use Iscar E90A (0.394&quot; max DOC) below.</div>
 <div class="tip">30 total cutting edges across 5 inserts = excellent insert economy. Grade F40M is the Seco first-choice PVD grade for stainless/ISO M at low-to-medium cutting speeds.</div>
 </div>
 
@@ -493,11 +498,14 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <tr><td>Max DOC (ap)</td><td><span class="num">0.394&quot;</span></td><td>3× the Seco Square 6 — generous headroom</td></tr>
 <tr><td>Shank</td><td><span class="num">3/4&quot; Weldon</span></td><td>Verify 3/4&quot; collet available on NHX5000</td></tr>
 </table>
-<div class="section-title" style="font-size:.85rem;margin:10px 0 6px">Starting Cuts — 13-8 PH Stainless</div>
+<div class="section-title" style="font-size:.85rem;margin:10px 0 6px">Starting Cuts — 13-8 PH Stainless (4 inserts, 1.000&quot; dia)</div>
+<div class="note" style="margin-bottom:8px">RPM = (Vc × 12) / (π × 1.000) &nbsp;|&nbsp; IPM = fz × 4 × RPM</div>
 <table class="param-table">
 <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
 <tr><td>Surface speed (Vc)</td><td><span class="num">150–250 SFM</span></td><td>Conservative for aged 13-8 (H950–H1000)</td></tr>
-<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.004 IPT</span></td><td>4 inserts = higher chip load per tooth feasible</td></tr>
+<tr><td>Spindle RPM</td><td><span class="num">573–955 RPM</span></td><td>@ 150–250 SFM on 1&quot; dia</td></tr>
+<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.004 IPT</span></td><td>4 inserts — higher chip load per tooth feasible</td></tr>
+<tr><td><strong>Feed rate (IPM)</strong></td><td><span class="num" style="color:#3fb950;font-weight:700">4.6–15.3 IPM</span></td><td>Low: 0.002×4×573 &nbsp;High: 0.004×4×955</td></tr>
 <tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.300&quot;</span></td><td>Significant margin available</td></tr>
 <tr><td>Coolant</td><td><span class="num">Flood</span></td><td>Required for 13-8 PH</td></tr>
 </table>
