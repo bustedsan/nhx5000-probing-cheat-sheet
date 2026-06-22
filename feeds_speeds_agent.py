@@ -113,6 +113,18 @@ TOOLS = {
         "insert":   "HNGJ0604 KCSM40",
         "brand":    "Kennametal",
     },
+    "toolmex_1in_long": {
+        "label":    "Toolmex ADK 1\" Long-Reach (3.9\" LOC)",
+        "body":     "ADK-D1.00-W1.00-3.9-2-15",
+        "diameter": 1.000,
+        "inserts":  2,
+        "max_doc":  0.394,
+        "lead_deg": 90,
+        "insert":   "ADKT 1505PDR TM20",
+        "brand":    "Toolmex",
+        # Reduced SFM due to 3.9" LOC — high L/D lowers rigidity
+        "rec_override": {"sfm_lo": 150, "sfm_hi": 200, "ipt_lo": 0.002, "ipt_hi": 0.003},
+    },
 }
 
 # ── Recommended starting cuts for 13-8 PH (H950/H1000) ─────────────────────
@@ -142,7 +154,7 @@ SEP2 = "═" * 72
 
 def print_tool(key, sfm=None, ipt=None):
     t = TOOLS[key]
-    rec = get_rec(t["diameter"])
+    rec = t.get("rec_override") or get_rec(t["diameter"])
 
     sfm_lo = sfm  if sfm  else rec["sfm_lo"]
     sfm_hi = sfm  if sfm  else rec["sfm_hi"]
@@ -165,6 +177,8 @@ def print_tool(key, sfm=None, ipt=None):
 
     doc_warn = " ⚠ EXCEEDS MAX DOC" if 0.125 > t["max_doc"] else ""
     print(f"\n  Min DOC target: 0.125\"  |  Tool max DOC: {t['max_doc']:.3f}\"{doc_warn}")
+    if "rec_override" in t:
+        print(f"  ⚠ LONG-REACH: SFM reduced for high L/D ratio — verify chatter before production")
     print(f"  Coolant: FLOOD required  |  No dwell in cut")
 
 
@@ -176,7 +190,7 @@ def print_table_all():
     print(f"  {'─'*28} {'─'*5} {'─'*3} {'─'*5} {'─'*5} {'─'*6} {'─'*7} {'─'*7}  {'─'*20}")
 
     for key, t in TOOLS.items():
-        rec = get_rec(t["diameter"])
+        rec = t.get("rec_override") or get_rec(t["diameter"])
         rpm, ipm = calc(t["diameter"], t["inserts"], rec["sfm_lo"], rec["ipt_lo"])
         grade = t["insert"].split()[-1]
         print(
