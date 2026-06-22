@@ -66,6 +66,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <div class="tab" onclick="showTab('tool-diam')">&#9004; Tool Diameter</div>
 <div class="tab" onclick="showTab('offset-write')">&#128221; Offset Writing</div>
 <div class="tab" onclick="showTab('ipi')">&#128200; In-Process</div>
+<div class="tab" onclick="showTab('endmill-insert')">&#9881; Endmill Inserts</div>
 </div>
 <!-- TAB: PROBE SETUP -->
 <div id="probe-setup" class="content active">
@@ -369,3 +370,114 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 </div>
 </div>
 </div>
+
+<!-- TAB: ENDMILL INSERTS — 13-8 PH STAINLESS -->
+<div id="endmill-insert" class="content">
+<div class="section-title">Indexable Endmill Selection — 13-8 PH Stainless (ISO M / PH Martensitic)</div>
+
+<div class="note">13-8 PH (UNS S13800) is a precipitation-hardening martensitic stainless. Aged condition (H950–H1050) reaches 350–450 HB / 38–44 HRC. Work-hardens rapidly — requires positive rake, sharp edges, no dwelling in cut, and conservative surface speeds.</div>
+
+<div class="grid">
+
+<!-- PRIMARY RECOMMENDATION -->
+<div class="card">
+<h3><span class="icon">&#9733;</span>Primary: Sandvik CoroMill 390 — Cutter Body</h3>
+<table class="param-table">
+<tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Part #</td><td><span class="lit">RA390-025M25-11M</span></td><td>1.000&quot; dia, 1.000&quot; Weldon shank</td></tr>
+<tr><td>Alt shank</td><td><span class="lit">RA390-025M19-11M</span></td><td>1.000&quot; dia, 3/4&quot; Weldon shank</td></tr>
+<tr><td>Insert pocket</td><td><span class="num">R390-11</span></td><td>Size-11 inserts</td></tr>
+<tr><td>Lead angle</td><td><span class="num">90°</span></td><td>True shoulder — no wall taper</td></tr>
+<tr><td>Max DOC (ap)</td><td><span class="num">0.394&quot;</span></td><td>Exceeds 0.125&quot; minimum</td></tr>
+<tr><td>Flutes</td><td><span class="num">2</span></td><td>Standard 1&quot; Weldon body</td></tr>
+</table>
+<div class="tip">90° lead angle produces a true vertical shoulder wall with no taper — critical for mating surface fits on 13-8 structural parts.</div>
+</div>
+
+<!-- INSERT SELECTION -->
+<div class="card">
+<h3><span class="icon">&#9651;</span>Primary: Sandvik R390-11 Insert — Grade 1025</h3>
+<table class="param-table">
+<tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Part #</td><td><span class="lit">R390-11 T3 12E-PM 1025</span></td><td>First-choice for ISO M stainless</td></tr>
+<tr><td>Geometry</td><td><span class="num">-PM</span></td><td>Positive, medium — low cutting forces</td></tr>
+<tr><td>Grade</td><td><span class="num">1025</span></td><td>PVD TiCN+TiN coating</td></tr>
+<tr><td>ISO application</td><td><span class="num">M</span></td><td>Stainless steel optimized</td></tr>
+<tr><td>Corner radius</td><td><span class="num">0.047&quot; (1.2 mm)</span></td><td>T3 = ANSI corner radius code</td></tr>
+<tr><td>Cutting edges</td><td><span class="num">2</span></td><td>Per insert</td></tr>
+</table>
+<div class="note">For interrupted cuts or aged 13-8 (H950/H1000): substitute grade <span class="lit">2030</span> (PVD TiAlN+TiN) — toughest Sandvik milling grade, better shock resistance.</div>
+</div>
+
+<!-- CUTTING DATA -->
+<div class="card">
+<h3><span class="icon">&#128200;</span>Starting Cutting Data — 13-8 PH Shoulder Milling</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Surface speed (Vc)</td><td><span class="num">100–150 SFM</span></td><td>Conservative for PH grades; increase with flood coolant</td></tr>
+<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.003 IPT</span></td><td>Stay positive — no dwell in cut</td></tr>
+<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.250&quot;</span></td><td>Minimum 0.125&quot; shoulder milling</td></tr>
+<tr><td>Radial DOC (ae)</td><td><span class="num">50–75% dia</span></td><td>0.500–0.750&quot; for 1&quot; cutter</td></tr>
+<tr><td>Coolant</td><td><span class="num">Flood</span></td><td>Required — prevents work hardening from heat buildup</td></tr>
+<tr><td>Spindle RPM</td><td><span class="num">~380–575 RPM</span></td><td>@ 100–150 SFM on 1&quot; dia</td></tr>
+</table>
+<div class="warn">Never dwell or feed-hold in cut. 13-8 work-hardens instantly at the cut interface — any pause builds a hardened layer that can chip the insert on re-entry.</div>
+</div>
+
+<!-- ALTERNATIVE: KENNAMETAL -->
+<div class="card">
+<h3><span class="icon">&#9670;</span>Alternative: Kennametal Mill 1-18</h3>
+<table class="param-table">
+<tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Body Part #</td><td><span class="lit">M1D100E1803W100L275</span></td><td>1.000&quot; dia, 1.000&quot; Weldon, 3-flute</td></tr>
+<tr><td>Insert</td><td><span class="lit">EDPT11T308PDPR</span></td><td>Grade KCPM40 for stainless</td></tr>
+<tr><td>Grade KCPM40</td><td><span class="num">PVD-coated</span></td><td>ISO M optimized, good for PH grades</td></tr>
+<tr><td>Max DOC</td><td><span class="num">0.312&quot;</span></td><td>EDPT 11T308 insert pocket</td></tr>
+<tr><td>Lead angle</td><td><span class="num">90°</span></td><td>True shoulder</td></tr>
+</table>
+<div class="tip">Mill 1-18 supports higher material removal rate with 3-flute body — good for rough shoulder passes where surface finish is secondary.</div>
+</div>
+
+<!-- MATERIAL NOTES -->
+<div class="card">
+<h3><span class="icon">&#9888;</span>13-8 PH Material Notes</h3>
+<table class="param-table">
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>UNS</td><td>S13800</td></tr>
+<tr><td>ISO classification</td><td>M — Stainless (aged: borderline S)</td></tr>
+<tr><td>Condition H950</td><td>~220 ksi UTS / 44 HRC</td></tr>
+<tr><td>Condition H1000</td><td>~205 ksi UTS / 42 HRC</td></tr>
+<tr><td>Condition H1050</td><td>~185 ksi UTS / 38 HRC</td></tr>
+<tr><td>Work hardening</td><td>High — rapid at cut interface</td></tr>
+<tr><td>Thermal conductivity</td><td>Low — heat builds in workpiece</td></tr>
+</table>
+<div class="note">At H950 (hardest aging), 13-8 behaves more like ISO S (superalloy) — consider dropping Vc to 80–100 SFM and using grade 2030 inserts.</div>
+</div>
+
+<!-- GRADE SELECTION QUICK REF -->
+<div class="card">
+<h3><span class="icon">&#128203;</span>Insert Grade Quick Reference — Stainless / PH</h3>
+<table class="param-table">
+<tr><th>Grade</th><th>Coating</th><th>Use When</th></tr>
+<tr><td><span class="lit">1025</span></td><td>PVD TiCN+TiN</td><td>First choice — continuous shoulder cuts, annealed or H1050</td></tr>
+<tr><td><span class="lit">2030</span></td><td>PVD TiAlN+TiN</td><td>Interrupted cuts, H950/H1000, tougher conditions</td></tr>
+<tr><td><span class="lit">KCPM40</span></td><td>PVD (Kennametal)</td><td>ISO M stainless, Kennametal Mill 1-18 system</td></tr>
+</table>
+<div class="tip">Always verify the condition (H950 vs H1050) before selecting grade. Hardness difference of ~6 HRC between conditions significantly affects tool life.</div>
+</div>
+
+</div><!-- /grid -->
+</div><!-- /endmill-insert tab -->
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.content').forEach(function(c) { c.classList.remove('active'); });
+  var btn = document.querySelector('[onclick="showTab(\'' + id + '\')"]');
+  if (btn) btn.classList.add('active');
+  var pane = document.getElementById(id);
+  if (pane) pane.classList.add('active');
+}
+</script>
+</body>
+</html>
