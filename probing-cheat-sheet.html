@@ -381,7 +381,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 
 <!-- PRIMARY RECOMMENDATION -->
 <div class="card">
-<h3><span class="icon">&#9733;</span>Primary: Sandvik CoroMill 390 — Cutter Body</h3>
+<h3><span class="icon">&#9733;</span>Primary: Sandvik CoroMill 390 — 1&quot; Body (2 inserts)</h3>
 <table class="param-table">
 <tr><th>Field</th><th>Value</th><th>Notes</th></tr>
 <tr><td>Part #</td><td><span class="lit">RA390-025M25-11M</span></td><td>1.000&quot; dia, 1.000&quot; Weldon shank</td></tr>
@@ -392,6 +392,22 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <tr><td>Flutes</td><td><span class="num">2</span></td><td>Standard 1&quot; Weldon body</td></tr>
 </table>
 <div class="tip">90° lead angle produces a true vertical shoulder wall with no taper — critical for mating surface fits on 13-8 structural parts.</div>
+</div>
+
+<!-- 5-INSERT HIGH-PRODUCTIVITY OPTION -->
+<div class="card" style="border-color:#238636">
+<h3><span class="icon">&#9733;</span>High-Productivity: Sandvik CoroMill 390 — 2&quot; Body (5 inserts)</h3>
+<table class="param-table">
+<tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Part #</td><td><span class="lit">RA390-051R19-11M</span></td><td>2.000&quot; dia, 3/4&quot; arbor (shell mill)</td></tr>
+<tr><td>Insert pockets</td><td><span class="num">5</span></td><td>Uses same R390-11 inserts as 1&quot; body</td></tr>
+<tr><td>Insert pocket</td><td><span class="num">R390-11</span></td><td>Size-11 — no insert change needed</td></tr>
+<tr><td>Lead angle</td><td><span class="num">90°</span></td><td>True shoulder</td></tr>
+<tr><td>Max DOC (ap)</td><td><span class="num">0.394&quot;</span></td><td>Same as 1&quot; body</td></tr>
+<tr><td>Mounting</td><td><span class="num">3/4&quot; arbor</span></td><td>Requires CAT40/HSK-A63 shell mill holder</td></tr>
+</table>
+<div class="tip">5 inserts = 2.5× the feed rate vs the 2-insert 1&quot; body at the same chip load. Same R390-11 insert part number — no change to insert order.</div>
+<div class="note">Shell mill mounting: use a CAT40 or HSK-A63 shell mill arbor holder. The 2&quot; dia requires more radial engagement planning — reduce ae to 40–50% dia when first running to check deflection.</div>
 </div>
 
 <!-- INSERT SELECTION -->
@@ -452,6 +468,17 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <tr><td>Thermal conductivity</td><td>Low — heat builds in workpiece</td></tr>
 </table>
 <div class="note">At H950 (hardest aging), 13-8 behaves more like ISO S (superalloy) — consider dropping Vc to 80–100 SFM and using grade 2030 inserts.</div>
+</div>
+
+<!-- CUTTER BODY COMPARISON -->
+<div class="card">
+<h3><span class="icon">&#9660;</span>Cutter Body Selection — CoroMill 390 at a Glance</h3>
+<table class="param-table">
+<tr><th>Body</th><th>Dia</th><th>Inserts</th><th>Shank</th><th>Rel. MRR</th><th>Best For</th></tr>
+<tr><td><span class="lit">RA390-025M25-11M</span></td><td><span class="num">1.000&quot;</span></td><td><span class="num">2</span></td><td>1&quot; Weldon</td><td>1×</td><td>Finishing, tight pockets</td></tr>
+<tr><td><span class="lit">RA390-051R19-11M</span></td><td><span class="num">2.000&quot;</span></td><td><span class="num" style="color:#3fb950;font-weight:700">5</span></td><td>3/4&quot; arbor</td><td>2.5×</td><td>Roughing, open shoulders, high productivity</td></tr>
+</table>
+<div class="note">Both use the <span class="lit">R390-11 T3 12E-PM 1025</span> insert — identical insert stocking for either body.</div>
 </div>
 
 <!-- GRADE SELECTION QUICK REF -->
