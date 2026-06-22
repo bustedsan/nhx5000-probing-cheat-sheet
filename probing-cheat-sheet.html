@@ -454,6 +454,56 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <div class="tip">Mill 1-18 supports higher material removal rate with 3-flute body — good for rough shoulder passes where surface finish is secondary.</div>
 </div>
 
+<!-- SECO SQUARE 6 — 5 inserts at 1 inch -->
+<div class="card" style="border-color:#d29922">
+<h3><span class="icon">&#9733;</span>Seco Square 6 — 1&quot; dia, 5 inserts (different brand)</h3>
+<table class="param-table">
+<tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Body Part #</td><td><span class="lit">R217.96-01.00-3-04-5A</span></td><td>1.000&quot; dia, Weldon C-lock shank</td></tr>
+<tr><td>Insert pockets</td><td><span class="num" style="color:#3fb950;font-weight:700">5</span></td><td>6 cutting edges per insert = 30 total edges</td></tr>
+<tr><td>Insert type</td><td><span class="num">XOMX size-04</span></td><td>Double-sided trigon, 6 edges/insert</td></tr>
+<tr><td>Insert grade</td><td><span class="lit">F40M</span></td><td>PVD TiAlN+TiN — first choice ISO M stainless</td></tr>
+<tr><td>Lead angle</td><td><span class="num">90°</span></td><td>True square shoulder</td></tr>
+<tr><td>Max DOC (ap)</td><td><span class="num">0.157&quot; (4 mm)</span></td><td>Tight — only 32% above 0.125&quot; floor</td></tr>
+<tr><td>Shank</td><td><span class="num">Weldon / C-lock</span></td><td>Standard Weldon flat on shank</td></tr>
+</table>
+<div class="section-title" style="font-size:.85rem;margin:10px 0 6px">Starting Cuts — 13-8 PH Stainless</div>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Surface speed (Vc)</td><td><span class="num">300–450 SFM</span></td><td>Derate from nominal 560 SFM (ordinary stainless) for PH hardness</td></tr>
+<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.003 IPT</span></td><td>Stay positive — no dwell in cut</td></tr>
+<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.140&quot;</span></td><td>Stay ≤0.140&quot; to leave margin below 0.157&quot; max</td></tr>
+<tr><td>Radial DOC (ae)</td><td><span class="num">50–70% dia</span></td><td>0.500–0.700&quot; for 1&quot; cutter</td></tr>
+<tr><td>Coolant</td><td><span class="num">Flood</span></td><td>Required for 13-8 PH</td></tr>
+</table>
+<div class="warn">Max DOC is 0.157&quot; — run ≤0.140&quot; on 13-8 to maintain safety margin as insert wears. If DOC > 0.125&quot; is needed regularly, consider Iscar E90A (0.394&quot; max DOC) below.</div>
+<div class="tip">30 total cutting edges across 5 inserts = excellent insert economy. Grade F40M is the Seco first-choice PVD grade for stainless/ISO M at low-to-medium cutting speeds.</div>
+</div>
+
+<!-- ISCAR E90A — 4 inserts, superior DOC -->
+<div class="card" style="border-color:#1f6feb">
+<h3><span class="icon">&#9670;</span>Iscar HM90 E90A — 1&quot; dia, 4 inserts (different brand)</h3>
+<table class="param-table">
+<tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Body Part #</td><td><span class="lit">E90A-D1.00-4-W.75</span></td><td>1.000&quot; dia, 3/4&quot; Weldon shank</td></tr>
+<tr><td>Insert pockets</td><td><span class="num">4</span></td><td>Higher DOC headroom than Seco Square 6</td></tr>
+<tr><td>Insert</td><td><span class="lit">APKT 1003PDR-HM IC808</span></td><td>IC908 discontinued — use IC808 (modern replacement)</td></tr>
+<tr><td>Grade IC808</td><td><span class="num">PVD submicron TiAlN</span></td><td>Replaces IC908 — tough grade for PH/austenitic stainless</td></tr>
+<tr><td>Lead angle</td><td><span class="num">90°</span></td><td>True square shoulder</td></tr>
+<tr><td>Max DOC (ap)</td><td><span class="num">0.394&quot;</span></td><td>3× the Seco Square 6 — generous headroom</td></tr>
+<tr><td>Shank</td><td><span class="num">3/4&quot; Weldon</span></td><td>Verify 3/4&quot; collet available on NHX5000</td></tr>
+</table>
+<div class="section-title" style="font-size:.85rem;margin:10px 0 6px">Starting Cuts — 13-8 PH Stainless</div>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Surface speed (Vc)</td><td><span class="num">150–250 SFM</span></td><td>Conservative for aged 13-8 (H950–H1000)</td></tr>
+<tr><td>Feed/tooth (fz)</td><td><span class="num">0.002–0.004 IPT</span></td><td>4 inserts = higher chip load per tooth feasible</td></tr>
+<tr><td>Axial DOC (ap)</td><td><span class="num">0.125–0.300&quot;</span></td><td>Significant margin available</td></tr>
+<tr><td>Coolant</td><td><span class="num">Flood</span></td><td>Required for 13-8 PH</td></tr>
+</table>
+<div class="note">Iscar IC908 is discontinued. Order <span class="lit">APKT 1003PDR-HM IC808</span> — IC808 is the current-generation drop-in replacement with improved toughness and wear resistance for stainless/PH grades.</div>
+</div>
+
 <!-- MATERIAL NOTES -->
 <div class="card">
 <h3><span class="icon">&#9888;</span>13-8 PH Material Notes</h3>
@@ -472,23 +522,28 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 
 <!-- CUTTER BODY COMPARISON -->
 <div class="card">
-<h3><span class="icon">&#9660;</span>Cutter Body Selection — CoroMill 390 at a Glance</h3>
+<h3><span class="icon">&#9660;</span>All-Tool Comparison — 1&quot; Shoulder Mills for 13-8 PH</h3>
 <table class="param-table">
-<tr><th>Body</th><th>Dia</th><th>Inserts</th><th>Shank</th><th>Rel. MRR</th><th>Best For</th></tr>
-<tr><td><span class="lit">RA390-025M25-11M</span></td><td><span class="num">1.000&quot;</span></td><td><span class="num">2</span></td><td>1&quot; Weldon</td><td>1×</td><td>Finishing, tight pockets</td></tr>
-<tr><td><span class="lit">RA390-051R19-11M</span></td><td><span class="num">2.000&quot;</span></td><td><span class="num" style="color:#3fb950;font-weight:700">5</span></td><td>3/4&quot; arbor</td><td>2.5×</td><td>Roughing, open shoulders, high productivity</td></tr>
+<tr><th>Brand</th><th>Body Part #</th><th>Dia</th><th>Inserts</th><th>Max DOC</th><th>Shank</th><th>Best For</th></tr>
+<tr><td>Sandvik</td><td><span class="lit">RA390-025M25-11M</span></td><td><span class="num">1.000&quot;</span></td><td><span class="num">2</span></td><td>0.394&quot;</td><td>1&quot; Weldon</td><td>Finishing, tight pockets</td></tr>
+<tr><td>Seco</td><td><span class="lit">R217.96-01.00-3-04-5A</span></td><td><span class="num">1.000&quot;</span></td><td><span class="num" style="color:#3fb950;font-weight:700">5</span></td><td>0.157&quot; ⚠</td><td>Weldon C-lock</td><td>1&quot; dia + 5 inserts, 30 cutting edges</td></tr>
+<tr><td>Iscar</td><td><span class="lit">E90A-D1.00-4-W.75</span></td><td><span class="num">1.000&quot;</span></td><td><span class="num">4</span></td><td>0.394&quot;</td><td>3/4&quot; Weldon</td><td>Best DOC margin at 1&quot; dia</td></tr>
+<tr><td>Kennametal</td><td><span class="lit">M1D100E1803W100L275</span></td><td><span class="num">1.000&quot;</span></td><td><span class="num">3</span></td><td>0.312&quot;</td><td>1&quot; Weldon</td><td>Roughing, high MRR 1&quot; dia</td></tr>
+<tr><td>Sandvik</td><td><span class="lit">RA390-051R19-11M</span></td><td><span class="num">2.000&quot;</span></td><td><span class="num" style="color:#3fb950;font-weight:700">5</span></td><td>0.394&quot;</td><td>3/4&quot; arbor</td><td>5 inserts + full DOC (2&quot; dia only)</td></tr>
 </table>
-<div class="note">Both use the <span class="lit">R390-11 T3 12E-PM 1025</span> insert — identical insert stocking for either body.</div>
+<div class="warn">⚠ Seco Square 6 max DOC = 0.157&quot; — run ≤0.140&quot; on 13-8 to maintain margin. If deeper cuts needed regularly, use Iscar E90A or Sandvik 2&quot; body.</div>
 </div>
 
 <!-- GRADE SELECTION QUICK REF -->
 <div class="card">
 <h3><span class="icon">&#128203;</span>Insert Grade Quick Reference — Stainless / PH</h3>
 <table class="param-table">
-<tr><th>Grade</th><th>Coating</th><th>Use When</th></tr>
-<tr><td><span class="lit">1025</span></td><td>PVD TiCN+TiN</td><td>First choice — continuous shoulder cuts, annealed or H1050</td></tr>
-<tr><td><span class="lit">2030</span></td><td>PVD TiAlN+TiN</td><td>Interrupted cuts, H950/H1000, tougher conditions</td></tr>
-<tr><td><span class="lit">KCPM40</span></td><td>PVD (Kennametal)</td><td>ISO M stainless, Kennametal Mill 1-18 system</td></tr>
+<tr><th>Grade</th><th>Brand</th><th>Coating</th><th>Use When</th></tr>
+<tr><td><span class="lit">1025</span></td><td>Sandvik</td><td>PVD TiCN+TiN</td><td>First choice — continuous shoulder cuts, H1050</td></tr>
+<tr><td><span class="lit">2030</span></td><td>Sandvik</td><td>PVD TiAlN+TiN</td><td>Interrupted cuts, H950/H1000, tougher conditions</td></tr>
+<tr><td><span class="lit">KCPM40</span></td><td>Kennametal</td><td>PVD</td><td>ISO M stainless, Kennametal Mill 1-18 system</td></tr>
+<tr><td><span class="lit">F40M</span></td><td>Seco</td><td>PVD TiAlN+TiN</td><td>Square 6 XOMX inserts — first choice ISO M stainless</td></tr>
+<tr><td><span class="lit">IC808</span></td><td>Iscar</td><td>PVD submicron TiAlN</td><td>E90A system — replaces discontinued IC908 for PH/austenitic stainless</td></tr>
 </table>
 <div class="tip">Always verify the condition (H950 vs H1050) before selecting grade. Hardness difference of ~6 HRC between conditions significantly affects tool life.</div>
 </div>
