@@ -369,3 +369,312 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 </div>
 </div>
 </div>
+<!-- TAB: TOOL LENGTH -->
+<div id="tool-length" class="content">
+<div class="section-title">Tool Length Offset — NHX5000 Setup</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#128295;</span>HSK-A63 Weldon Holder — 1&quot; Milling</h3>
+<table class="param-table">
+<tr><th>Spec</th><th>Value</th></tr>
+<tr><td>Taper Standard</td><td>HSK-A63 (DIN 69893 Form A)</td></tr>
+<tr><td>Bore Diameter</td><td>1.000&quot; (25.4 mm)</td></tr>
+<tr><td>Holder Style</td><td>Weldon side-lock (set screw)</td></tr>
+<tr><td>Flat Standard</td><td>Weldon flat on shank (ANSI B94.19)</td></tr>
+<tr><td>Gauge Line Dia</td><td>63 mm (2.480&quot;)</td></tr>
+<tr><td>Set Screw</td><td>M8 or M10 (manufacturer-specific)</td></tr>
+<tr><td>Typical Projection</td><td>2.500&quot; – 4.000&quot; from spindle face</td></tr>
+<tr><td>Max TIR at tip</td><td>&le; 0.0002&quot; (3&times; diameter out)</td></tr>
+</table>
+<div class="note">Weldon side-lock holders are preferred for heavy roughing — the set screw against the Weldon flat prevents axial pull-out. Always verify the flat is properly aligned to the set screw before tightening.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#9998;</span>Weldon Holder — Assembly Checklist</h3>
+<table class="param-table">
+<tr><th>Step</th><th>Action</th><th>Note</th></tr>
+<tr><td>1</td><td>Clean HSK taper bore and holder bore</td><td>No chips, oil film, or burrs</td></tr>
+<tr><td>2</td><td>Insert 1&quot; end mill — align Weldon flat</td><td>Flat must face set screw port</td></tr>
+<tr><td>3</td><td>Set tool stickout</td><td>Minimum stickout for rigidity</td></tr>
+<tr><td>4</td><td>Torque set screw to spec</td><td>Typical 20–40 Nm (check holder data)</td></tr>
+<tr><td>5</td><td>Measure total tool length</td><td>Presetter or on-machine TLS</td></tr>
+<tr><td>6</td><td>Enter H offset</td><td>G10 L1 P[n] Z[measured]</td></tr>
+<tr><td>7</td><td>Confirm G43 H[n] in program</td><td>Required before any Z move</td></tr>
+<tr><td>8</td><td>Check TIR at tool tip</td><td>&le; 0.0002&quot; for finish work</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>Tool Length — On-Machine TLS Measurement</h3>
+<div class="code-block"><span class="cmt">( MEASURE TOOL LENGTH — NHX5000 TLS CYCLE )
+( Positions over table-mounted tool sensor )</span>
+
+<span class="n">O0800</span>          <span class="cmt">( TOOL LENGTH MEASURE )</span>
+<span class="g">G90</span> <span class="g">G20</span>
+<span class="m">T5</span> <span class="m">M6</span>          <span class="cmt">( Load 1&quot; end mill — tool 5 )</span>
+<span class="m">S200</span> <span class="m">M3</span>        <span class="cmt">( Slow spindle for TLS measurement )</span>
+<span class="g">G43</span> <span class="n">H5</span> <span class="g">G0</span> <span class="n">Z4.</span> <span class="cmt">( Apply current H5, retract Z )</span>
+
+<span class="cmt">( Rapid to TLS position )</span>
+<span class="g">G0</span> <span class="n">X[TLS_X]</span> <span class="n">Y[TLS_Y]</span>
+<span class="g">G0</span> <span class="n">Z1.0</span>
+
+<span class="cmt">( Measure — result writes to H offset )</span>
+<span class="g">G320</span> <span class="n">D6</span> <span class="n">F5.</span> <span class="n">L1.0</span>
+<span class="var">#120</span><span class="lit">=</span><span class="var">#5003</span>    <span class="cmt">( Capture measured Z )</span>
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">Z</span><span class="var">#120</span> <span class="cmt">( Write to H5 offset )</span>
+
+<span class="m">M5</span>
+<span class="g">G91</span> <span class="g">G28</span> <span class="n">Z0</span>
+<span class="m">M30</span></div>
+<div class="note">Replace [TLS_X] and [TLS_Y] with your machine's table sensor position. Confirm actual TLS cycle with your DMG Mori documentation — some machines use a custom macro instead of G320.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>1&quot; End Mill / HSK-A63 Weldon — Program Call</h3>
+<div class="code-block"><span class="cmt">( 1&quot; 4-FLUTE END MILL — FACE / SHOULDER MILL )
+( HSK-A63 WELDON HOLDER — TOOL 5 )</span>
+
+<span class="g">G90</span> <span class="g">G94</span> <span class="g">G17</span>
+<span class="g">G20</span>
+<span class="m">T5</span> <span class="m">M6</span>          <span class="cmt">( Load 1&quot; end mill )</span>
+<span class="n">S2500</span> <span class="m">M3</span>      <span class="cmt">( Verify RPM for material )</span>
+<span class="g">G43</span> <span class="n">H5</span> <span class="g">G0</span> <span class="n">Z2.</span> <span class="cmt">( TLO active — safe retract )</span>
+<span class="m">M8</span>             <span class="cmt">( Coolant ON )</span>
+
+<span class="g">G0</span> <span class="n">X-1.0</span> <span class="n">Y0.</span>
+<span class="g">G1</span> <span class="n">Z-0.100</span> <span class="n">F20.</span>
+<span class="g">G1</span> <span class="n">X5.0</span> <span class="n">F30.</span>    <span class="cmt">( Face pass )</span>
+
+<span class="g">G0</span> <span class="n">Z2.0</span>
+<span class="m">M9</span>
+<span class="m">M5</span></div>
+</div>
+</div>
+</div>
+<!-- TAB: TOOL BREAKAGE -->
+<div id="tool-break" class="content">
+<div class="section-title">Tool Breakage Detection — NHX5000</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#9888;</span>Breakage Check — Concept</h3>
+<div class="code-block"><span class="cmt">( TOOL BREAKAGE CHECK — AFTER CRITICAL OP )
+( Compare current tool length to known good )
+( Uses G320 D6 to touch TLS, compare to H offset )</span>
+
+<span class="var">#121</span><span class="lit">=</span><span class="num">3.500</span>     <span class="cmt">( Nominal tool length )</span>
+<span class="var">#123</span><span class="lit">=</span><span class="num">0.030</span>     <span class="cmt">( Breakage tolerance — 0.030&quot; )</span>
+
+<span class="cmt">( Measure tool after operation )</span>
+<span class="g">G320</span> <span class="n">D6</span> <span class="n">F5.</span> <span class="n">L1.0</span>
+<span class="var">#120</span><span class="lit">=</span><span class="var">#5003</span>    <span class="cmt">( Measured length )</span>
+
+<span class="var">#122</span><span class="lit">=[</span><span class="var">#121</span><span class="lit">-</span><span class="var">#120</span><span class="lit">]</span>  <span class="cmt">( Length loss )</span>
+<span class="g">IF</span> <span class="lit">[</span><span class="var">#122</span> <span class="lit">GT </span><span class="var">#123</span><span class="lit">]</span> <span class="g">GOTO</span> <span class="num">9990</span>
+<span class="g">GOTO</span> <span class="num">9989</span>
+<span class="n">N9990</span> <span class="cmt">( TOOL BROKEN — ALARM )</span>
+<span class="var">#3000</span><span class="lit">=</span><span class="num">102</span> <span class="lit">(TOOL 5 BROKEN - CHECK)</span>
+<span class="n">N9989</span></div>
+<div class="warn">Always use a breakage tolerance appropriate for the tool diameter. For a 1&quot; end mill, 0.030&quot; is a typical minimum breakage threshold.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>Breakage Check Parameter Reference</h3>
+<table class="param-table">
+<tr><th>Variable</th><th>Description</th><th>Example</th></tr>
+<tr><td>#120</td><td>Measured tool length (from TLS)</td><td>Auto-populated</td></tr>
+<tr><td>#121</td><td>Nominal tool length</td><td>3.500</td></tr>
+<tr><td>#122</td><td>Length loss (#121 - #120)</td><td>Calculated</td></tr>
+<tr><td>#123</td><td>Breakage threshold</td><td>0.030</td></tr>
+<tr><td>#3000</td><td>Fanuc alarm trigger</td><td>#3000=102 (msg)</td></tr>
+</table>
+<div class="tip">Set #3000 with a message string to display a meaningful alarm. The machine will feed-hold and show the message on the operator screen.</div>
+</div>
+</div>
+</div>
+<!-- TAB: TOOL DIAMETER -->
+<div id="tool-diam" class="content">
+<div class="section-title">Tool Diameter / Radius Offset — NHX5000</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#9004;</span>Tool Radius Offset — G41 / G42</h3>
+<div class="code-block"><span class="cmt">( TOOL RADIUS COMPENSATION )
+( D offset = tool radius stored in D register )
+( 1&quot; end mill: nominal radius = 0.500&quot; )</span>
+
+<span class="g">G41</span> <span class="n">D5</span>     <span class="cmt">( Left compensation — climb milling )</span>
+<span class="g">G42</span> <span class="n">D5</span>     <span class="cmt">( Right compensation — conventional )</span>
+<span class="g">G40</span>       <span class="cmt">( Cancel radius compensation )</span>
+
+<span class="cmt">( Set D5 radius offset via G10: )</span>
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">R0.500</span>  <span class="cmt">( Nominal — 1&quot; dia / 2 )</span>
+<span class="cmt">( Adjust R for measured actual diameter )</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>Measure Tool Diameter — Two-Touch Method</h3>
+<div class="code-block"><span class="cmt">( MEASURE ACTUAL TOOL DIAMETER )
+( Touch +X then -X on tool flutes )
+( Tool must be stopped — probe at flute height )</span>
+
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+
+<span class="cmt">( Touch +X flute )</span>
+<span class="g">G0</span> <span class="n">X-0.75</span> <span class="n">Y0.</span> <span class="n">Z[flute_Z]</span>
+<span class="g">G320</span> <span class="n">D1</span> <span class="n">F5.</span> <span class="n">L0.5</span>
+<span class="var">#130</span><span class="lit">=</span><span class="var">#5001</span>   <span class="cmt">( Save +X contact )</span>
+
+<span class="cmt">( Touch -X flute )</span>
+<span class="g">G0</span> <span class="n">X0.75</span>
+<span class="g">G320</span> <span class="n">D2</span> <span class="n">F5.</span> <span class="n">L0.5</span>
+<span class="var">#131</span><span class="lit">=</span><span class="var">#5001</span>   <span class="cmt">( Save -X contact )</span>
+
+<span class="var">#132</span><span class="lit">=[</span><span class="var">#130</span><span class="lit">-</span><span class="var">#131</span><span class="lit">]</span>  <span class="cmt">( Measured diameter )</span>
+<span class="cmt">( Write actual radius to D offset )</span>
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">R</span><span class="lit">[</span><span class="var">#132</span><span class="lit">/2]</span>
+<span class="m">M145</span></div>
+<div class="note">Tool must be stationary during diameter measurement. Index spindle to a consistent angular position (M19) for repeatable results across multiple measurements.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>Diameter Offset Reference</h3>
+<table class="param-table">
+<tr><th>Variable</th><th>Description</th></tr>
+<tr><td>#130</td><td>+X flute contact position</td></tr>
+<tr><td>#131</td><td>-X flute contact position</td></tr>
+<tr><td>#132</td><td>Measured diameter (#130 - #131)</td></tr>
+<tr><td>#131 nom</td><td>1.000&quot; for 1&quot; end mill</td></tr>
+<tr><td>D register</td><td>Stores radius (dia/2) for G41/G42</td></tr>
+</table>
+</div>
+</div>
+</div>
+<!-- TAB: OFFSET WRITING -->
+<div id="offset-write" class="content">
+<div class="section-title">Offset Writing — G10 Reference</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#128221;</span>G10 — Work Offset Write (G54–G59)</h3>
+<div class="code-block"><span class="cmt">( G10 WORK OFFSET WRITE FORMAT )
+( L2 = work offset, P = offset number )
+( P1=G54, P2=G55, P3=G56, P4=G57, P5=G58, P6=G59 )</span>
+
+<span class="g">G10</span> <span class="n">L2</span> <span class="n">P1</span> <span class="n">X0.</span>       <span class="cmt">( Write G54 X zero )</span>
+<span class="g">G10</span> <span class="n">L2</span> <span class="n">P1</span> <span class="n">Y0.</span>       <span class="cmt">( Write G54 Y zero )</span>
+<span class="g">G10</span> <span class="n">L2</span> <span class="n">P1</span> <span class="n">Z0.</span>       <span class="cmt">( Write G54 Z zero )</span>
+<span class="g">G10</span> <span class="n">L2</span> <span class="n">P1</span> <span class="n">X</span><span class="var">#102</span>     <span class="cmt">( Write computed center to G54 X )</span>
+
+<span class="cmt">( Extended offsets: G54.1 P1 through P48 )
+( L20 = extended work offset )</span>
+<span class="g">G10</span> <span class="n">L20</span> <span class="n">P1</span> <span class="n">X0.</span>      <span class="cmt">( G54.1 P1 X zero )</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128221;</span>G10 — Tool Length Offset Write</h3>
+<div class="code-block"><span class="cmt">( G10 TOOL OFFSET WRITE FORMAT )
+( L1 = geometry offset, L11 = wear offset )
+( P = tool number )</span>
+
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">Z3.500</span>   <span class="cmt">( Set H5 length = 3.500&quot; )</span>
+<span class="g">G10</span> <span class="n">L11</span> <span class="n">P5</span> <span class="n">Z0.</span>     <span class="cmt">( Clear H5 wear = 0 )</span>
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">R0.500</span>  <span class="cmt">( Set D5 radius = 0.500&quot; )</span>
+<span class="g">G10</span> <span class="n">L11</span> <span class="n">P5</span> <span class="n">R0.</span>    <span class="cmt">( Clear D5 radius wear = 0 )</span>
+
+<span class="cmt">( Write measured result from variable )</span>
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">Z</span><span class="var">#120</span>   <span class="cmt">( H5 = measured tool length )</span>
+<span class="g">G10</span> <span class="n">L1</span> <span class="n">P5</span> <span class="n">R</span><span class="lit">[</span><span class="var">#132</span><span class="lit">/2]</span> <span class="cmt">( D5 = half measured diameter )</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>G10 L-Code Reference</h3>
+<table class="param-table">
+<tr><th>L Code</th><th>Description</th><th>Axis</th></tr>
+<tr><td>G10 L1</td><td>Tool geometry offset (H/D)</td><td>Z = length, R = radius</td></tr>
+<tr><td>G10 L11</td><td>Tool wear offset</td><td>Z = length wear, R = radius wear</td></tr>
+<tr><td>G10 L2</td><td>Work offset (absolute)</td><td>X/Y/Z</td></tr>
+<tr><td>G10 L12</td><td>Work offset (incremental)</td><td>X/Y/Z</td></tr>
+<tr><td>G10 L20</td><td>Extended work offset G54.1 Pn</td><td>X/Y/Z</td></tr>
+</table>
+<div class="warn">G10 writes are permanent and take effect immediately. Always verify the written value with a G43 dry run before cutting. Incorrect H offsets cause tool crashes.</div>
+</div>
+</div>
+</div>
+<!-- TAB: IN-PROCESS -->
+<div id="ipi" class="content">
+<div class="section-title">In-Process Inspection — NHX5000</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#128200;</span>In-Process X/Y Center — Bore or Boss</h3>
+<div class="code-block"><span class="cmt">( IN-PROCESS: FIND CENTER AFTER ROUGH BORE )
+( Four-touch method — +X -X +Y -Y )</span>
+
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+
+<span class="cmt">( Touch +X )</span>
+<span class="g">G0</span> <span class="n">X1.1</span> <span class="n">Y0.</span> <span class="n">Z[probe_Z]</span>
+<span class="g">G320</span> <span class="n">D2</span> <span class="n">F10.</span> <span class="n">L0.5</span>
+<span class="var">#100</span><span class="lit">=</span><span class="var">#5001</span>
+
+<span class="cmt">( Touch -X )</span>
+<span class="g">G0</span> <span class="n">X-1.1</span>
+<span class="g">G320</span> <span class="n">D1</span> <span class="n">F10.</span> <span class="n">L0.5</span>
+<span class="var">#101</span><span class="lit">=</span><span class="var">#5001</span>
+<span class="var">#102</span><span class="lit">=[</span><span class="var">#100</span><span class="lit">+</span><span class="var">#101</span><span class="lit">]/2</span>
+
+<span class="cmt">( Touch +Y )</span>
+<span class="g">G0</span> <span class="n">X0.</span> <span class="n">Y1.1</span>
+<span class="g">G320</span> <span class="n">D4</span> <span class="n">F10.</span> <span class="n">L0.5</span>
+<span class="var">#103</span><span class="lit">=</span><span class="var">#5002</span>
+
+<span class="cmt">( Touch -Y )</span>
+<span class="g">G0</span> <span class="n">Y-1.1</span>
+<span class="g">G320</span> <span class="n">D3</span> <span class="n">F10.</span> <span class="n">L0.5</span>
+<span class="var">#104</span><span class="lit">=</span><span class="var">#5002</span>
+<span class="var">#105</span><span class="lit">=[</span><span class="var">#103</span><span class="lit">+</span><span class="var">#104</span><span class="lit">]/2</span>
+
+<span class="cmt">( Write found center to G54 )</span>
+<span class="g">G10</span> <span class="n">L2</span> <span class="n">P1</span> <span class="n">X</span><span class="var">#102</span> <span class="n">Y</span><span class="var">#105</span>
+<span class="m">M145</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>In-Process Z Surface Check</h3>
+<div class="code-block"><span class="cmt">( VERIFY Z AFTER FACING PASS )
+( Compare measured Z to nominal depth )</span>
+
+<span class="var">#110</span><span class="lit">=</span><span class="num">-0.500</span>    <span class="cmt">( Nominal Z depth )</span>
+<span class="var">#111</span><span class="lit">=</span><span class="num">0.002</span>     <span class="cmt">( Tolerance )</span>
+
+<span class="m">M144</span>
+<span class="g">G4</span> <span class="n">P1.0</span>
+<span class="g">G0</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z0.5</span>
+<span class="g">G320</span> <span class="n">X0.</span> <span class="n">Y0.</span> <span class="n">Z0.1</span> <span class="n">D6</span> <span class="n">F5.</span> <span class="n">L0.5</span>
+<span class="var">#103</span><span class="lit">=</span><span class="var">#5003</span>    <span class="cmt">( Measured Z surface )</span>
+
+<span class="var">#105</span><span class="lit">=[</span><span class="var">#103</span><span class="lit">-</span><span class="var">#110</span><span class="lit">]</span>  <span class="cmt">( Deviation )</span>
+<span class="g">IF</span> <span class="lit">[ABS[</span><span class="var">#105</span><span class="lit">] GT </span><span class="var">#111</span><span class="lit">]</span> <span class="g">GOTO</span> <span class="num">9999</span>
+<span class="g">GOTO</span> <span class="num">9998</span>
+<span class="n">N9999</span>
+<span class="var">#3000</span><span class="lit">=</span><span class="num">103</span> <span class="lit">(Z DEPTH OUT OF TOLERANCE)</span>
+<span class="n">N9998</span>
+<span class="m">M145</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>In-Process Inspection — Quick Reference</h3>
+<table class="param-table">
+<tr><th>Feature</th><th>Touches</th><th>G320 Directions</th><th>Result</th></tr>
+<tr><td>X surface</td><td>1</td><td>D1 or D2</td><td>#5001</td></tr>
+<tr><td>Y surface</td><td>1</td><td>D3 or D4</td><td>#5002</td></tr>
+<tr><td>Z surface</td><td>1</td><td>D6</td><td>#5003</td></tr>
+<tr><td>X center (boss/bore)</td><td>2</td><td>D1 + D2</td><td>([#5001a+#5001b]/2)</td></tr>
+<tr><td>Y center (boss/bore)</td><td>2</td><td>D3 + D4</td><td>([#5002a+#5002b]/2)</td></tr>
+<tr><td>XY center (4-touch)</td><td>4</td><td>D1+D2+D3+D4</td><td>#102, #105</td></tr>
+<tr><td>Width / diameter</td><td>2</td><td>Opposite pair</td><td>#101-#100</td></tr>
+</table>
+<div class="tip">Always rapid to a safe XY position before changing Z height when moving between touches. Never move diagonally through a bore while at probe depth.</div>
+</div>
+</div>
+</div>
+<script>
+function showTab(id){
+  document.querySelectorAll('.content').forEach(function(el){el.classList.remove('active')});
+  document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
