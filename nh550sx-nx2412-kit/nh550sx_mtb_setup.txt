@@ -1,0 +1,213 @@
+============================================================
+  NH550SX — NX 2412 Machine Tool Builder (MTB) Setup Notes
+  Machine : Toyoda NH550SX Horizontal Machining Center
+  Format  : Plain-text reference for MTB configuration
+============================================================
+
+────────────────────────────────────────────────────────────
+SECTION 1 — MACHINE IDENTIFICATION
+────────────────────────────────────────────────────────────
+Machine Name        : TOYODA_NH550SX
+Machine Type        : Milling — Horizontal Machining Center
+Number of Axes      : 4 (X Y Z B)
+Controller          : Fanuc 30i-B
+Rotary Axis Type    : B-axis, table rotary (workpiece rotates)
+Table Size          : 550 x 550 mm
+Max Table Load      : 800 kg
+Spindle Taper       : BT50 / HSK-A100
+
+MTX File Name       : TOYODA_NH550SX.mtx
+Save Location       : %UGII_CAM_LIBRARY_DIR%\machines\TOYODA_NH550SX.mtx
+
+
+────────────────────────────────────────────────────────────
+SECTION 2 — KINEMATIC CHAIN DEFINITION
+────────────────────────────────────────────────────────────
+Build the kinematic tree in MTB exactly as shown below.
+Order matters — parent → child relationships define how
+axes drive each other.
+
+  WORLD (fixed base)
+  ├── X_JOINT  → X_SLIDE (table left/right)
+  │   └── B_JOINT  → B_TABLE (rotary table)
+  │       └── PALLET / FIXTURE (workpiece side)
+  │
+  └── Y_JOINT  → Y_COLUMN (column up/down)
+      └── Z_JOINT  → Z_SPINDLE (spindle in/out)
+          └── SPINDLE_NOSE (tool side)
+
+
+────────────────────────────────────────────────────────────
+SECTION 3 — JOINT PARAMETERS
+────────────────────────────────────────────────────────────
+
+Joint     Type     Axis Vector  Min (mm/°)  Max (mm/°)  Home     Rapid
+────────  ───────  ───────────  ──────────  ──────────  ───────  ──────────
+X_JOINT   Linear   +X (1,0,0)  0 mm        900 mm      450 mm   40 m/min
+Y_JOINT   Linear   +Y (0,1,0)  0 mm        800 mm      400 mm   32 m/min
+Z_JOINT   Linear   +Z (0,0,1)  0 mm        900 mm      450 mm   40 m/min
+B_JOINT   Rotary   +Y (0,1,0)  -180.000°   +180.000°   0.000°   900 °/min
+
+Notes:
+  - X and Z share the same rapid rate on NH550SX
+  - Y rapid rate is lower (ballscrew pitch difference)
+  - B rapid rate is 25 RPM = 25 × 360 = 9000 °/min MAX
+    BUT use 900 °/min (2.5 RPM) in post for safety in sim
+    Confirm actual rapid rate with machine parameter #1420
+
+
+────────────────────────────────────────────────────────────
+SECTION 4 — GEOMETRY ASSIGNMENT
+────────────────────────────────────────────────────────────
+Import STEP/JT machine bodies and assign to kinematic nodes:
+
+Node          Geometry Body           STEP Part Name
+───────────   ───────────────────     ──────────────────────────
+WORLD         Machine Base            NH550SX_BASE.stp
+Y_JOINT       Column Body             NH550SX_COLUMN.stp
+Z_JOINT       Spindle Head            NH550SX_SPINDLE_HEAD.stp
+SPINDLE_NOSE  Spindle Nose (cone)     NH550SX_SPINDLE_NOSE.stp
+X_JOINT       Table Slide             NH550SX_TABLE_SLIDE.stp
+B_JOINT       Rotary Table Body       NH550SX_ROTARY_TABLE.stp
+B_JOINT       T-Slot Surface          NH550SX_TSLOT_SURFACE.stp
+
+Tip: If machine STEP files not available from Toyoda,
+build simplified block geometry in NX Modeling that
+represents the swept envelope of each machine component.
+This is sufficient for collision detection.
+
+
+────────────────────────────────────────────────────────────
+SECTION 5 — B-AXIS PIVOT ORIGIN
+────────────────────────────────────────────────────────────
+The B-axis joint origin in MTB must be placed at:
+  - Center of the rotary table in X and Z (machine coords)
+  - At the table top surface level in Y
+
+In machine coordinates (G53):
+  B_JOINT Origin X = Machine X at table center
+  B_JOINT Origin Y = Table top surface height
+  B_JOINT Origin Z = Machine Z at table center
+
+This is the EXACT SAME POINT that the control uses as the
+B-axis pivot in its rotary compensation (Fanuc param #1240
+for B-axis reference position).
+
+To find this on the machine:
+  1. Mount a precision sphere on the table
+  2. Indicate the sphere at B=0 and record G53 X, Z
+  3. This is the B-axis center in machine coordinates
+  4. Enter these values as the MTB B_JOINT origin
+
+
+────────────────────────────────────────────────────────────
+SECTION 6 — COLLISION SETS
+────────────────────────────────────────────────────────────
+In MTB: Edit > Collision Sets
+
+Create these collision pairs (CHECK = will alarm if touching):
+
+  Set Name              Body A              Body B
+  ────────────────────  ──────────────────  ──────────────────
+  COL_HEAD_TABLE        SPINDLE_HEAD        ROTARY_TABLE
+  COL_HEAD_FIXTURE      SPINDLE_HEAD        FIXTURE (dynamic)
+  COL_TOOL_TABLE        TOOL (dynamic)      ROTARY_TABLE
+  COL_TOOL_MACHINE      TOOL (dynamic)      MACHINE_BASE
+  COL_HOLDER_TABLE      TOOLHOLDER (dyn)    ROTARY_TABLE
+  COL_HOLDER_FIXTURE    TOOLHOLDER (dyn)    FIXTURE (dynamic)
+
+EXCLUDE these pairs (always touching — not collisions):
+  SPINDLE_NOSE ↔ TOOLHOLDER   (tool is held in spindle)
+  TABLE_SLIDE  ↔ ROTARY_TABLE (table sits on slide)
+
+Dynamic bodies (set in CAM session):
+  TOOL, TOOLHOLDER, FIXTURE, STOCK
+
+
+────────────────────────────────────────────────────────────
+SECTION 7 — MACHINE CONTROL PARAMETERS
+────────────────────────────────────────────────────────────
+Enter in MTB under Machine Control tab:
+
+Parameter                    Value        Notes
+─────────────────────────    ──────────   ─────────────────────────
+Tool change position X       Machine X0   Use G28 X
+Tool change position Y       Machine Y0   Use G28 Y
+Tool change position Z       Machine Z0   Use G28 Z
+Tool change B position       0.000°       B must be at home for ATC
+Max spindle speed            10000 RPM
+Max tool weight              25 kg        BT50 max toolholder weight
+Max tool length              400 mm       Longer = check at B±90
+Max tool diameter            320 mm       Check swing clearance
+Coolant positions            0 (default)  Machine has auto coolant
+
+
+────────────────────────────────────────────────────────────
+SECTION 8 — NX 2412 MTB FILE PATHS
+────────────────────────────────────────────────────────────
+
+File/Directory                          Purpose
+──────────────────────────────────────  ────────────────────────────
+%UGII_CAM_LIBRARY_DIR%\machines\        Machine .mtx files location
+%UGII_CAM_LIBRARY_DIR%\step\            Machine STEP geometry
+%UGII_CAM_POST_DIR%\                    Post processor .tcl files
+%UGII_CAM_LIBRARY_DIR%\tool\            Tool library .dat files
+%UGII_VENDOR_DIR%\ugcam\kin\            NX kinematic kernel files
+
+NX 2412 specific: Machine Tool Builder accessed via
+  Menu → Manufacturing → Machine Tool → Machine Tool Builder
+  OR: Application → Manufacturing → [right-click MCS] → MTB
+
+
+────────────────────────────────────────────────────────────
+SECTION 9 — VALIDATION PROCEDURE
+────────────────────────────────────────────────────────────
+
+After building the MTB machine, validate by:
+
+Step 1: Open ISV (Simulate Machine from any operation)
+Step 2: In ISV jog panel, set each axis to min limit — verify
+        no geometry interpenetration
+Step 3: Set each axis to max limit — verify no interpenetration
+Step 4: Set B = +90° — verify spindle head clears table body
+Step 5: Set B = -90° — repeat
+Step 6: Set B = +180° — repeat
+Step 7: Set B = -180° — repeat
+Step 8: Extend Z to max (spindle nose closest to table) while B=0
+        Verify Z minimum clearance between spindle nose and table top
+Step 9: Return all axes to home — verify no collision at home
+Step 10: Export MTX — File > Export Machine > MTX
+
+Pass criteria:
+  ✓  Zero collisions at all limit positions
+  ✓  Machine animates smoothly through full B range
+  ✓  Geometry correctly attached to each kinematic node
+       (verify by jogging one axis at a time)
+  ✓  ISV loads machine without errors or missing geometry warnings
+
+
+────────────────────────────────────────────────────────────
+SECTION 10 — KNOWN NH550SX CLEARANCE CRITICAL POINTS
+────────────────────────────────────────────────────────────
+
+1. Spindle nose to table top at B=0 with Z at minimum:
+   Minimum observed clearance ≈ 80 mm (with no toolholder)
+   With BT50 toolholder + short tool: ~40 mm
+   → Always check with actual toolholder geometry in ISV
+
+2. Column face to table at B=0 with X at maximum:
+   Small clearance at max X — do not program X max during cutting
+
+3. ATC Magazine to spindle envelope:
+   Magazine is on column left side — do not program B±35° to ±55°
+   while at X max position (column near magazine)
+   NOTE: Machine interlocks handle this but model it in MTB
+
+4. Tombstone 400 mm tall at B=90°:
+   Tombstone top corner can reach within 50 mm of column face
+   → Restrict Y minimum when running tall tombstones
+
+
+============================================================
+END OF MTB SETUP NOTES
+============================================================

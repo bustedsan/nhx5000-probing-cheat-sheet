@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NH550SX 4th Axis — NX 2412 Simulation Kit</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --accent: #1f6feb;
+    --accent2: #388bfd;
+    --green: #3fb950;
+    --yellow: #e3b341;
+    --red: #f85149;
+    --orange: #d29922;
+    --purple: #bc8cff;
+    --cyan: #79c0ff;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --code-bg: #0d1117;
+    --sidebar-w: 220px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  #sidebar-header {
+    padding: 16px 14px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #sidebar-header .machine { font-size: 13px; font-weight: 700; color: var(--cyan); letter-spacing: .5px; }
+  #sidebar-header .sub    { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .nav-group { padding: 8px 0 4px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    padding: 4px 14px;
+  }
+
+  .nav-btn {
+    display: block;
+    width: 100%;
+    padding: 7px 14px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background .15s, border-color .15s;
+  }
+  .nav-btn:hover  { background: rgba(255,255,255,.04); }
+  .nav-btn.active { background: rgba(31,111,235,.12); border-left-color: var(--accent); color: var(--cyan); font-weight: 600; }
+
+  /* ── Main ── */
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 36px;
+  }
+
+  .tab { display: none; }
+  .tab.active { display: block; }
+
+  h1 { font-size: 22px; font-weight: 700; color: var(--cyan); margin-bottom: 6px; }
+  h2 { font-size: 17px; font-weight: 700; color: var(--text); margin: 28px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 14px; font-weight: 700; color: var(--accent2); margin: 18px 0 8px; }
+  p  { color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .badge-green  { background: rgba(63,185,80,.15); color: var(--green); border: 1px solid rgba(63,185,80,.3); }
+  .badge-yellow { background: rgba(227,179,65,.15); color: var(--yellow); border: 1px solid rgba(227,179,65,.3); }
+  .badge-red    { background: rgba(248,81,73,.15);  color: var(--red);    border: 1px solid rgba(248,81,73,.3); }
+  .badge-blue   { background: rgba(31,111,235,.15); color: var(--cyan);   border: 1px solid rgba(31,111,235,.3); }
+
+  /* ── Tables ── */
+  .tbl { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  .tbl th { background: #1c2128; color: var(--muted); font-weight: 600; text-align: left; padding: 8px 10px; border: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  .tbl td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; }
+  .tbl tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  .tbl .mono { font-family: 'SFMono-Regular', Consolas, monospace; color: var(--green); font-size: 12px; }
+  .tbl .note { color: var(--muted); font-size: 12px; }
+  .tbl .warn { color: var(--yellow); }
+  .tbl .ok   { color: var(--green); }
+
+  /* ── Code blocks ── */
+  .code-wrap { position: relative; margin: 12px 0; }
+  .code-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); background: #1c2128; border: 1px solid var(--border); border-bottom: none; padding: 4px 10px; display: inline-block; border-radius: 4px 4px 0 0; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 0 6px 6px 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 26px;
+    right: 10px;
+    background: #21262d;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .copy-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .copy-btn.copied { background: var(--green); color: #000; border-color: var(--green); }
+
+  /* ── Step cards ── */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 14px; margin: 14px 0; }
+  .step-card {
+    display: flex;
+    gap: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .step-num {
+    counter-increment: step;
+    min-width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-num::before { content: counter(step); }
+  .step-body h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .step-body p  { font-size: 13px; color: var(--muted); margin: 0; }
+  .step-body code { background: #21262d; border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 12px; color: var(--green); }
+
+  /* ── Info / Warning / Tip boxes ── */
+  .callout { border-left: 4px solid; border-radius: 0 6px 6px 0; padding: 12px 14px; margin: 14px 0; }
+  .callout.info   { border-color: var(--accent); background: rgba(31,111,235,.08); }
+  .callout.warn   { border-color: var(--yellow); background: rgba(227,179,65,.08); }
+  .callout.danger { border-color: var(--red);    background: rgba(248,81,73,.08);  }
+  .callout.tip    { border-color: var(--green);  background: rgba(63,185,80,.08);  }
+  .callout strong { display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+  .callout.info   strong { color: var(--cyan); }
+  .callout.warn   strong { color: var(--yellow); }
+  .callout.danger strong { color: var(--red); }
+  .callout.tip    strong { color: var(--green); }
+  .callout p { color: var(--text); font-size: 13px; margin: 0; }
+
+  /* ── Grid cards ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 14px 0; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .card h4 { font-size: 13px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; }
+  .card ul { list-style: none; padding: 0; }
+  .card ul li { font-size: 12px; color: var(--muted); padding: 3px 0; border-bottom: 1px solid rgba(48,54,61,.5); }
+  .card ul li:last-child { border: none; }
+  .card ul li span { color: var(--text); float: right; font-weight: 600; }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; padding: 0; margin: 12px 0; }
+  .checklist li { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
+  .checklist li:last-child { border: none; }
+  .checklist li::before { content: "☐"; color: var(--accent); font-size: 15px; flex-shrink: 0; margin-top: -1px; }
+  .checklist li.done::before { content: "☑"; color: var(--green); }
+
+  /* ── Color tokens in code ── */
+  .kw  { color: #ff7b72; }
+  .fn  { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .num { color: #79c0ff; }
+  .cmt { color: #8b949e; font-style: italic; }
+  .var { color: #ffa657; }
+  .ok  { color: #3fb950; }
+
+  /* ── Axis diagram ── */
+  .axis-diagram {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 14px 0;
+    text-align: center;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .axis-diagram .axis-x { color: #f85149; font-weight: 700; }
+  .axis-diagram .axis-y { color: #3fb950; font-weight: 700; }
+  .axis-diagram .axis-z { color: #388bfd; font-weight: 700; }
+  .axis-diagram .axis-b { color: #d29922; font-weight: 700; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav id="sidebar">
+  <div id="sidebar-header">
+    <div class="machine">NH550SX · 4th Axis</div>
+    <div class="sub">NX 2412 Simulation Kit</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Setup</div>
+    <button class="nav-btn active" onclick="show('overview')">Overview</button>
+    <button class="nav-btn" onclick="show('machine-builder')">Machine Builder</button>
+    <button class="nav-btn" onclick="show('kinematics')">Kinematics</button>
+    <button class="nav-btn" onclick="show('4th-axis')">4th Axis Config</button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">CAM</div>
+    <button class="nav-btn" onclick="show('cam-setup')">CAM Setup</button>
+    <button class="nav-btn" onclick="show('post-processor')">Post Processor</button>
+    <button class="nav-btn" onclick="show('operation-templates')">Operation Templates</button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Simulation</div>
+    <button class="nav-btn" onclick="show('sim-workflow')">Sim Workflow</button>
+    <button class="nav-btn" onclick="show('collision')">Collision Setup</button>
+    <button class="nav-btn" onclick="show('verification')">Verification</button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Reference</div>
+    <button class="nav-btn" onclick="show('gcode-ref')">G-Code Reference</button>
+    <button class="nav-btn" onclick="show('troubleshoot')">Troubleshooting</button>
+    <button class="nav-btn" onclick="show('checklist')">Pre-Run Checklist</button>
+  </div>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main id="main">
+
+<!-- ════════ TAB: OVERVIEW ════════ -->
+<div id="tab-overview" class="tab active">
+  <h1>NH550SX 4th Axis — NX 2412 Simulation Kit</h1>
+  <p>Complete setup guide for Siemens NX 2412 machine simulation, CAM configuration, and post processor for the Toyoda NH550SX horizontal machining center with 4th-axis B-axis rotary table.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Machine</h4>
+      <ul>
+        <li>Model <span>Toyoda NH550SX</span></li>
+        <li>Type <span>HMC 4-Axis</span></li>
+        <li>Control <span>Fanuc 30i-B</span></li>
+        <li>Rotary Axis <span>B-Axis (Table)</span></li>
+        <li>Table Size <span>550 × 550 mm</span></li>
+        <li>Max Load <span>800 kg</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Travels</h4>
+      <ul>
+        <li>X (table L/R) <span>900 mm</span></li>
+        <li>Y (column U/D) <span>800 mm</span></li>
+        <li>Z (spindle I/O) <span>900 mm</span></li>
+        <li>B (rotary) <span>−180° to +180°</span></li>
+        <li>B Rapid <span>25 RPM</span></li>
+        <li>Clamp Torque <span>3,500 N·m</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Spindle</h4>
+      <ul>
+        <li>Taper <span>BT50 / HSK-A100</span></li>
+        <li>Max RPM <span>10,000 RPM</span></li>
+        <li>Power <span>37 kW</span></li>
+        <li>Torque <span>720 N·m</span></li>
+        <li>Tool Capacity <span>60 / 120 ATC</span></li>
+        <li>Max Tool Dia <span>320 mm</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>NX 2412 Requirements</h4>
+      <ul>
+        <li>NX Version <span>2412.x</span></li>
+        <li>CAM Role <span>cam_general</span></li>
+        <li>MTB File <span>.mtx / .def</span></li>
+        <li>Post Builder <span>NX Post Builder</span></li>
+        <li>Sim Type <span>ISV / G-Code Sim</span></li>
+        <li>Kernel <span>NX Open API</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>What's in This Kit</h2>
+  <table class="tbl">
+    <tr><th>Section</th><th>Contents</th><th>File / Tool</th></tr>
+    <tr><td>Machine Builder</td><td>Kinematic chain, joint definitions, travel limits</td><td class="mono">NH550SX.mtx</td></tr>
+    <tr><td>Kinematics</td><td>Axis sequence diagram, coordinate frame, B-axis pivot</td><td class="mono">CAM Setup</td></tr>
+    <tr><td>4th Axis Config</td><td>Indexing vs continuous, clamping G-codes, safe angles</td><td class="mono">Post .tcl</td></tr>
+    <tr><td>CAM Setup</td><td>MCS/WCS, tool axis vectors, 4-axis turning templates</td><td class="mono">NX template</td></tr>
+    <tr><td>Post Processor</td><td>B-axis output, rotary feed, G68.2 / G54.4 blocks</td><td class="mono">nh550sx_fanuc30i.tcl</td></tr>
+    <tr><td>Operation Templates</td><td>3+1 indexed, 4-axis contouring, deep-hole B-index</td><td class="mono">.prt templates</td></tr>
+    <tr><td>Simulation Workflow</td><td>Step-by-step ISV and G-Code Sim setup</td><td class="mono">NX Mfg UI</td></tr>
+    <tr><td>Collision Setup</td><td>Fixture avoidance, B-axis swing clearance, holder checks</td><td class="mono">ISV bodies</td></tr>
+    <tr><td>Verification</td><td>Tool path review, gouge check, rotary undercut</td><td class="mono">NX Verify</td></tr>
+  </table>
+
+  <div class="callout info">
+    <strong>NX 2412 Note</strong>
+    <p>NX 2412 ships with an updated Machine Tool Builder that supports direct import of .step files as collision geometry. All instructions in this kit use the 2412 MTB UI paths. If you're on an earlier build, menu locations may differ slightly.</p>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: MACHINE BUILDER ════════ -->
+<div id="tab-machine-builder" class="tab">
+  <h1>Machine Tool Builder — NH550SX</h1>
+  <p>The NX Machine Tool Builder (MTB) defines the kinematic chain, travel limits, and collision geometry. Follow these steps in order.</p>
+
+  <h2>Step 1 — Create a New Machine</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Open Machine Tool Builder</h4>
+        <p>In NX 2412: <code>Menu → Manufacturing → Machine Tool Builder</code> — or press <code>Ctrl+Alt+M</code>. Select <strong>New Machine</strong>.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Set Machine Type</h4>
+        <p>Choose <strong>Milling</strong>. Machine configuration: <strong>Horizontal Machining Center</strong>. Number of axes: <strong>4</strong>.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Name and Save</h4>
+        <p>Machine Name: <code>TOYODA_NH550SX</code>. Save location: <code>UGII_CAM_LIBRARY_DIR/machines/</code>. This makes it available to all CAM sessions.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Step 2 — Define the Kinematic Tree</h2>
+  <p>The NH550SX is a <strong>B-on-table / moving-column</strong> architecture. Build the tree exactly as shown:</p>
+
+  <div class="code-wrap">
+    <div class="code-label">Kinematic Tree — NH550SX</div>
+    <pre><span class="cmt">World (fixed base)
+ └─ X_AXIS        ← linear, table traverses Left/Right
+     └─ B_AXIS    ← rotary, table rotates about Y (vertical axis of table)
+         └─ TABLE ← fixture / pallet mounts here (workpiece side)
+
+ └─ Y_AXIS        ← linear, column moves Up/Down
+     └─ Z_AXIS    ← linear, spindle moves In/Out (toward table)
+         └─ SPINDLE ← tool mounts here</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <div class="callout warn">
+    <strong>B-Axis Pivot Location</strong>
+    <p>The B-axis rotation center is at the center of the rotary table surface. Set the B-axis joint origin to the table center X=0, Y=0 (table surface height), Z=0 in machine coordinates. This must match your control's B-axis datum.</p>
+  </div>
+
+  <h2>Step 3 — Add Joints in MTB</h2>
+  <table class="tbl">
+    <tr><th>Joint Name</th><th>Type</th><th>Axis Vector</th><th>Min</th><th>Max</th><th>Home</th></tr>
+    <tr>
+      <td class="mono">X_AXIS</td><td>Linear</td><td class="mono">+X (1,0,0)</td>
+      <td class="mono">0</td><td class="mono">900 mm</td><td class="mono">450 mm</td>
+    </tr>
+    <tr>
+      <td class="mono">Y_AXIS</td><td>Linear</td><td class="mono">+Y (0,1,0)</td>
+      <td class="mono">0</td><td class="mono">800 mm</td><td class="mono">400 mm</td>
+    </tr>
+    <tr>
+      <td class="mono">Z_AXIS</td><td>Linear</td><td class="mono">+Z (0,0,1)</td>
+      <td class="mono">0</td><td class="mono">900 mm</td><td class="mono">500 mm</td>
+    </tr>
+    <tr>
+      <td class="mono">B_AXIS</td><td>Rotary</td><td class="mono">+Y (0,1,0)</td>
+      <td class="mono">−180°</td><td class="mono">+180°</td><td class="mono">0°</td>
+    </tr>
+  </table>
+
+  <h2>Step 4 — Import Collision Geometry</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Import Machine STEP File</h4>
+        <p>Right-click each MTB node → <strong>Add Geometry</strong> → import the corresponding .step body from the Toyoda machine model package. Assign to the correct kinematic node.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Minimum Required Bodies</h4>
+        <p>At minimum define: <strong>Column</strong> (Y+Z node), <strong>Spindle Head</strong> (Z node), <strong>Rotary Table</strong> (B node), <strong>Table Body / T-slots</strong> (X node). Add tool holders separately in the CAM session.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Assign Collision Sets</h4>
+        <p>In MTB: <strong>Edit → Collision Sets</strong>. Create pairs: <code>Spindle_Head ↔ Table</code>, <code>Spindle_Head ↔ Fixture</code>, <code>Tool ↔ Machine_Body</code>. Exclude tool-holder vs. spindle (always touching).</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Step 5 — Save and Validate</h2>
+  <div class="code-wrap">
+    <div class="code-label">MTB Validation Checklist</div>
+    <pre><span class="ok">✓</span> Move each axis to its min/max limits — no geometry overlap at limits
+<span class="ok">✓</span> Rotate B_AXIS to ±90° and ±180° — spindle/table clearance verified
+<span class="ok">✓</span> Home position (all zeros): no collision reported
+<span class="ok">✓</span> Machine coordinate origin matches control datum (G53 X0 Y0 Z0 = machine home)
+<span class="ok">✓</span> Save as .mtx — File → Export Machine → MTX format</pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: KINEMATICS ════════ -->
+<div id="tab-kinematics" class="tab">
+  <h1>Kinematics &amp; Coordinate Frames</h1>
+
+  <h2>Machine Axis Layout</h2>
+  <div class="axis-diagram">
+    <div style="margin-bottom:8px; color: var(--text);">NH550SX — Looking from Front (Operator Side)</div>
+    <pre style="background:none;border:none;padding:0;color:inherit;font-size:12px;">
+                          <span class="axis-y">Y ↑</span>  (Column Up/Down)
+                          │
+            Spindle → ○───┤
+                          │
+    ──────────────────────┼──────────── <span class="axis-z">Z (Spindle In/Out →)</span>
+                          │
+             Table ┌──────┴──────┐
+    <span class="axis-b">B ↺</span> (Rotary)  │   550×550   │
+                   └──────┬──────┘
+    ◀──────────────────────┼────────────▶ <span class="axis-x">X (Table Left/Right)</span>
+    </pre>
+  </div>
+
+  <h2>Coordinate System Rules</h2>
+  <table class="tbl">
+    <tr><th>Frame</th><th>Origin</th><th>Used For</th><th>Notes</th></tr>
+    <tr>
+      <td><strong>MCS</strong><br><span class="note">Machine Coord</span></td>
+      <td class="mono">Machine Home</td>
+      <td>ISV simulation reference</td>
+      <td class="note">G53 positions, tool change point</td>
+    </tr>
+    <tr>
+      <td><strong>WCS (G54)</strong><br><span class="note">Work Coord</span></td>
+      <td class="mono">Part origin</td>
+      <td>CAM MCS / WCS offset</td>
+      <td class="note">B=0° face datum; set at B-axis center if indexing</td>
+    </tr>
+    <tr>
+      <td><strong>B-Axis Center</strong></td>
+      <td class="mono">Table center</td>
+      <td>Rotary pivot point</td>
+      <td class="note">Must match NX MCS B pivot offset</td>
+    </tr>
+    <tr>
+      <td><strong>CSYS per face</strong></td>
+      <td class="mono">Face origin</td>
+      <td>3+1 indexed operations</td>
+      <td class="note">Defined by B angle + face offset</td>
+    </tr>
+  </table>
+
+  <h2>4th Axis Pivot Setup in NX</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Define B-Axis Center in CAM Setup</h4>
+        <p>In <strong>Operation Navigator → MCS → Edit</strong>: set <strong>Rotary Axis</strong> to <code>+Y</code> vector. Set <strong>Pivot Point</strong> to the center of your pallet / rotary table (measured from part zero in G54).</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>B-Axis Pivot Offset Example</h4>
+        <p>If your part zero (G54) is on the table face 200 mm above the table surface, and the B-axis center is at the table surface: Pivot offset = <code>Y = −200 mm</code> from G54 origin. Measure on the machine with an indicator.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Verify with Rotation Test</h4>
+        <p>Create a single NX Point at the part origin. Set B=90°. The point should remain at the same machine XZ position after rotation (only machine coordinates change, not the WCS point). If it drifts, the pivot offset is wrong.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>B-Axis Sign Convention</h2>
+  <table class="tbl">
+    <tr><th>B Value</th><th>Table Face</th><th>Spindle Points</th><th>Typical Use</th></tr>
+    <tr><td class="mono ok">B0°</td><td>Face 1 (Front)</td><td>−Z toward front of machine</td><td>Primary setup face</td></tr>
+    <tr><td class="mono">B90°</td><td>Face 2 (Left)</td><td>−Z toward left of machine</td><td>2nd op / fixture side</td></tr>
+    <tr><td class="mono">B180°</td><td>Face 3 (Back)</td><td>−Z toward back of machine</td><td>Opposing bores</td></tr>
+    <tr><td class="mono">B−90°</td><td>Face 4 (Right)</td><td>−Z toward right of machine</td><td>4th side features</td></tr>
+    <tr><td class="mono warn">B±180°</td><td colspan="3" class="warn">Limit — confirm no cable/hose wrap on your specific machine config</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <strong>Tip — B Direction</strong>
+    <p>Toyoda NH550SX follows the right-hand rule: positive B rotation is counter-clockwise viewed from above (+Y direction). Confirm with your machine's parameter sheet — some configurations invert this. Run G91 B90 F25 at slow feed and observe direction before using in production programs.</p>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: 4TH AXIS CONFIG ════════ -->
+<div id="tab-4th-axis" class="tab">
+  <h1>4th Axis Configuration</h1>
+
+  <h2>Indexing vs. Continuous Mode</h2>
+  <div class="card-grid">
+    <div class="card">
+      <h4>3+1 Indexed (Most Common)</h4>
+      <ul>
+        <li>B moves to angle <span>then clamps</span></li>
+        <li>Spindle machines <span>in XYZ only</span></li>
+        <li>Requires <span>M10 / M11</span></li>
+        <li>G-code <span>G00 B90. M10</span></li>
+        <li>NX operation <span>Fixed Contour</span></li>
+        <li>Axis in NX <span>Tool Axis = +ZM</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>4-Axis Continuous</h4>
+      <ul>
+        <li>B moves simultaneous <span>with XYZ</span></li>
+        <li>Table NOT clamped <span>during cut</span></li>
+        <li>Requires <span>M11 (unclamp)</span></li>
+        <li>G-code <span>G01 X_ B_ F_</span></li>
+        <li>NX operation <span>Variable Axis</span></li>
+        <li>Axis in NX <span>Relative to Drive</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Clamp / Unclamp M-Codes — NH550SX</h2>
+  <table class="tbl">
+    <tr><th>M-Code</th><th>Function</th><th>When to Use</th></tr>
+    <tr><td class="mono ok">M10</td><td>B-Axis Clamp</td><td>After indexing B to target angle before any cutting</td></tr>
+    <tr><td class="mono warn">M11</td><td>B-Axis Unclamp</td><td>Before any B-axis motion (rapid or feed)</td></tr>
+    <tr><td class="mono">M19</td><td>Spindle Orient</td><td>Before tool change (auto in ATC cycle)</td></tr>
+    <tr><td class="mono">M52</td><td>Pallet Clamp</td><td>After pallet load / APC exchange</td></tr>
+    <tr><td class="mono">M53</td><td>Pallet Unclamp</td><td>Before APC exchange</td></tr>
+  </table>
+
+  <div class="callout danger">
+    <strong>Never Cut with B Unclamped</strong>
+    <p>In 3+1 indexed mode, always verify M10 (clamp) is output before any X/Y/Z cutting motion. The NX post must insert M10 automatically after each B-axis index move. Cutting with the rotary unclamped will damage the clamp mechanism and produce scrap.</p>
+  </div>
+
+  <h2>B-Axis Index Template (Indexed Mode)</h2>
+  <div class="code-wrap">
+    <div class="code-label">G-Code — B-Axis Index Sequence</div>
+    <pre><span class="cmt">( ── INDEX TO B90 ────────────────────────────────────── )</span>
+<span class="kw">G91</span> <span class="kw">G28</span> Z0                 <span class="cmt">; retract Z to home</span>
+<span class="kw">G28</span> X0 Y0                   <span class="cmt">; retract XY to home (clear swing envelope)</span>
+<span class="var">M11</span>                         <span class="cmt">; B-axis UNCLAMP</span>
+<span class="kw">G90</span> <span class="kw">G00</span> B90.               <span class="cmt">; rotate to B=90°</span>
+<span class="var">M10</span>                         <span class="cmt">; B-axis CLAMP</span>
+<span class="kw">G54</span>                         <span class="cmt">; re-invoke work offset (B rotation may shift active offset)</span>
+<span class="kw">G00</span> X_ Y_ Z_               <span class="cmt">; approach for next operation</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <h2>Safe B-Axis Swing Clearances</h2>
+  <table class="tbl">
+    <tr><th>Fixture Type</th><th>Min Z Retract</th><th>Min X / Y Clear</th><th>Notes</th></tr>
+    <tr><td>Vise (standard)</td><td class="mono ok">Z home (G28)</td><td class="mono ok">X home (G28)</td><td class="note">Always safest</td></tr>
+    <tr><td>Tombstone (400H)</td><td class="mono warn">G28 Z only</td><td class="mono warn">G28 X + 50 mm</td><td class="note">Check tombstone radius vs. spindle nose</td></tr>
+    <tr><td>Custom fixture</td><td class="mono warn">Simulate first</td><td class="mono warn">Simulate first</td><td class="note">Use NX ISV collision check at every B angle</td></tr>
+    <tr><td>Extended tooling</td><td class="mono warn">G28 all axes</td><td class="mono warn">G28 all axes</td><td class="note">Long boring bars — check at B±90</td></tr>
+  </table>
+
+  <h2>B-Axis in NX CAM — Tool Axis Settings</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>3+1 Indexed Operation</h4>
+        <p>In any NX milling operation → <strong>Tool Axis</strong> tab → set to <strong>+ZM Axis</strong>. Then in the operation's <strong>Machine Control</strong> block, add B-axis angle as a parameter. The post will output the index move.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>4-Axis Continuous Operation</h4>
+        <p>Use <strong>Variable Contour</strong> operation. Tool Axis = <strong>Relative to Drive</strong> or <strong>Interpolate</strong>. Under <strong>Non-Cutting Moves</strong>, ensure B-axis retracts to safe position before transfers.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Set Rotary Axis in MCS</h4>
+        <p>In CAM Setup → <strong>MCS → Rotary Axis</strong>: Direction = <code>+YM</code> vector. This tells NX the B-axis rotates about the Y direction of the machine coordinate system.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: CAM SETUP ════════ -->
+<div id="tab-cam-setup" class="tab">
+  <h1>NX 2412 CAM Setup</h1>
+
+  <h2>CAM Session Initialization</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Enter Manufacturing Application</h4>
+        <p><code>Application → Manufacturing</code> (or <code>Ctrl+Alt+M</code>). Select CAM configuration: <code>cam_general</code>. This loads the standard milling environment with 4-axis support.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Create CAM Setup</h4>
+        <p>In Operation Navigator: right-click → <strong>Insert → Setup</strong>. Set MCS origin to your part datum. Under <strong>Machine Tool</strong>, select <code>TOYODA_NH550SX</code> from the library.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Configure MCS for B-Axis</h4>
+        <p>In the MCS dialog → <strong>Rotary Axis</strong> tab: Axis = <code>+Y</code>, Pivot from MCS origin = actual distance from part zero to B-axis center (measure on machine). Enter as signed offset.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Assign Work Offset</h4>
+        <p>Set <strong>G54</strong> as the primary work offset. For multi-face 3+1 programs, use a single G54 at the B-axis center — the post will handle face-specific offsets via B-angle output. Avoid creating separate G54/G55/G56 per face unless your shop standard requires it.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Tool Library Setup</h2>
+  <table class="tbl">
+    <tr><th>Tool Param</th><th>Setting</th><th>Notes</th></tr>
+    <tr><td>Holder Standard</td><td class="mono">BT50 / HSK-A100</td><td class="note">Match machine taper exactly for collision</td></tr>
+    <tr><td>Gauge Length</td><td class="mono">Measured value</td><td class="note">Use actual presetter measurement</td></tr>
+    <tr><td>Holder Geometry</td><td class="mono">From library or STEP</td><td class="note">Critical for 4-axis holder collision check</td></tr>
+    <tr><td>Number Format</td><td class="mono">T## H## D##</td><td class="note">Fanuc 30i-B format</td></tr>
+    <tr><td>Max Tool Dia</td><td class="mono">320 mm</td><td class="note">Larger tools require swing clearance check at B±90</td></tr>
+    <tr><td>Max Tool Length</td><td class="mono">Sim validates</td><td class="note">Long tools may collide with table at B=0 during Z motion</td></tr>
+  </table>
+
+  <h2>Feeds &amp; Speeds — General Guidelines</h2>
+  <table class="tbl">
+    <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+    <tr><td>B-Axis Rapid Feed</td><td class="mono">25 RPM (900°/min)</td><td class="note">Set as rotary rapid in post</td></tr>
+    <tr><td>B-Axis Clamp Feed</td><td class="mono">5–10 RPM</td><td class="note">Slow approach before M10 clamp</td></tr>
+    <tr><td>Linear Rapid (G00)</td><td class="mono">40 m/min (X/Z) / 32 m/min (Y)</td><td class="note">Do not use full rapid in 4-axis sim until verified</td></tr>
+    <tr><td>4-Axis Contour Feed</td><td class="mono">Part-specific</td><td class="note">NX computes combined vector feed; post uses FMAX or F value</td></tr>
+    <tr><td>Feed per Rev (boring)</td><td class="mono">Per cutting data</td><td class="note">Confirm G95 mode active if using FPR</td></tr>
+  </table>
+
+  <h2>Work Offset Strategy for 4-Face Machining</h2>
+  <div class="code-wrap">
+    <div class="code-label">Recommended Work Offset Setup — 4-Face Tombstone</div>
+    <pre><span class="cmt">( Strategy: Single G54 at B-axis center, on table surface )</span>
+<span class="cmt">( Face offsets are driven by B rotation only            )</span>
+
+<span class="cmt">Face 1 → B0°   — primary feature side</span>
+<span class="cmt">Face 2 → B90°  — secondary feature side  </span>
+<span class="cmt">Face 3 → B180° — opposing face</span>
+<span class="cmt">Face 4 → B270° (or B-90°) — 4th side</span>
+
+<span class="cmt">G54 X offset = 0 (B-axis center in X)</span>
+<span class="cmt">G54 Y offset = top of table surface or fixture datum</span>
+<span class="cmt">G54 Z offset = B-axis center in Z</span>
+
+<span class="kw">N100 G90 G54</span>
+<span class="kw">N110 G00 B0</span>           <span class="cmt">; Face 1</span>
+<span class="kw">N200 G00 B90</span>          <span class="cmt">; Face 2</span>
+<span class="kw">N300 G00 B180</span>         <span class="cmt">; Face 3</span>
+<span class="kw">N400 G00 B270</span>         <span class="cmt">; Face 4 (if in range)</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: POST PROCESSOR ════════ -->
+<div id="tab-post-processor" class="tab">
+  <h1>Post Processor — NH550SX Fanuc 30i-B</h1>
+  <p>Key post settings for the NH550SX 4-axis configuration. This covers NX Post Builder (.def) parameter settings and critical Tcl event handlers.</p>
+
+  <h2>Post Builder — Global Machine Settings</h2>
+  <table class="tbl">
+    <tr><th>Parameter</th><th>Setting</th><th>Notes</th></tr>
+    <tr><td>Controller Type</td><td class="mono">Fanuc 30i-B</td><td class="note">Select from library or custom</td></tr>
+    <tr><td>4th Axis Letter</td><td class="mono">B</td><td class="note">Machine Parameter setting</td></tr>
+    <tr><td>4th Axis Type</td><td class="mono">Table Rotary</td><td class="note">Workpiece rotates, tool is fixed direction</td></tr>
+    <tr><td>4th Axis Min</td><td class="mono">-180.0°</td><td></td></tr>
+    <tr><td>4th Axis Max</td><td class="mono">+180.0°</td><td></td></tr>
+    <tr><td>Rotary Resolution</td><td class="mono">0.001°</td><td class="note">3 decimal places for B output</td></tr>
+    <tr><td>Output Format B</td><td class="mono">B##.###</td><td class="note">Always signed output</td></tr>
+    <tr><td>Clamp Code</td><td class="mono">M10</td><td class="note">Output after index, before first cut move</td></tr>
+    <tr><td>Unclamp Code</td><td class="mono">M11</td><td class="note">Output before any B motion</td></tr>
+    <tr><td>Shortest Direction</td><td class="mono">Yes</td><td class="note">NX computes CW/CCW shortest path</td></tr>
+  </table>
+
+  <h2>Critical Post Events — Tcl Handlers</h2>
+
+  <div class="code-wrap">
+    <div class="code-label">proc nh550sx_rotary_move { } — B-Axis Index with Clamp</div>
+    <pre><span class="cmt"># Called every time B-axis changes position (indexed mode)</span>
+<span class="fn">proc</span> <span class="fn">MOM_rotary_axis_index</span> { } {
+    <span class="kw">global</span> mom_b_angle mom_prev_b_angle
+
+    <span class="cmt"># 1. Retract Z before rotating</span>
+    <span class="fn">MOM_do_template</span> z_retract
+
+    <span class="cmt"># 2. Output unclamp</span>
+    <span class="fn">MOM_output_literal</span> <span class="str">"M11"</span>
+
+    <span class="cmt"># 3. Output B rapid move</span>
+    <span class="fn">MOM_output_literal</span> <span class="str">"G00 B[format %.3f $mom_b_angle]"</span>
+
+    <span class="cmt"># 4. Dwell for B settle (optional, machine-dependent)</span>
+    <span class="cmt"># MOM_output_literal "G04 P500"</span>
+
+    <span class="cmt"># 5. Output clamp</span>
+    <span class="fn">MOM_output_literal</span> <span class="str">"M10"</span>
+}</pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label">B-Axis Continuous Output Block</div>
+    <pre><span class="cmt"># 4-axis continuous linear move block</span>
+<span class="cmt"># Outputs: G01 X_ Y_ Z_ B_ F_</span>
+<span class="fn">proc</span> <span class="fn">MOM_linear_move</span> { } {
+    <span class="kw">global</span> mom_pos mom_b_angle mom_feed_rate
+
+    <span class="fn">MOM_do_template</span> linear_move
+
+    <span class="cmt"># Format: G01 X## Y## Z## B## F##</span>
+    <span class="fn">MOM_output_literal</span> <span class="str">"G01\
+        X[format %.4f [lindex $mom_pos 0]]\
+        Y[format %.4f [lindex $mom_pos 1]]\
+        Z[format %.4f [lindex $mom_pos 2]]\
+        B[format %.3f $mom_b_angle]\
+        F[format %.0f $mom_feed_rate]"</span>
+}</pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label">Program Header — NH550SX Standard</div>
+    <pre><span class="cmt">%</span>
+<span class="kw">O0001</span> <span class="cmt">(NH550SX 4-AXIS PROGRAM)</span>
+<span class="cmt">(MACHINE  : TOYODA NH550SX)</span>
+<span class="cmt">(CONTROL  : FANUC 30I-B)</span>
+<span class="cmt">(DATE     : [DATE])</span>
+<span class="cmt">(SETUP    : [SETUP-NAME])</span>
+<span class="cmt">(MATERIAL : [MATERIAL])</span>
+<span class="kw">G17 G20 G40 G49 G80 G90</span>  <span class="cmt">; safety block</span>
+<span class="kw">G91 G28 Z0</span>                 <span class="cmt">; retract Z</span>
+<span class="kw">G91 G28 X0 Y0</span>              <span class="cmt">; retract XY</span>
+<span class="var">M11</span>                         <span class="cmt">; B unclamp</span>
+<span class="kw">G90 G00 B0</span>                 <span class="cmt">; B to home</span>
+<span class="var">M10</span>                         <span class="cmt">; B clamp</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label">Program Footer — NH550SX Standard</div>
+    <pre><span class="kw">G91 G28 Z0</span>                 <span class="cmt">; retract Z</span>
+<span class="kw">G91 G28 X0 Y0</span>              <span class="cmt">; retract XY</span>
+<span class="var">M11</span>                         <span class="cmt">; B unclamp</span>
+<span class="kw">G90 G00 B0</span>                 <span class="cmt">; B to home</span>
+<span class="var">M10</span>                         <span class="cmt">; B clamp</span>
+<span class="var">M05</span>                         <span class="cmt">; spindle stop</span>
+<span class="kw">M30</span>                         <span class="cmt">; program end / rewind</span>
+<span class="cmt">%</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <h2>Post Processor Settings — Quick Reference</h2>
+  <table class="tbl">
+    <tr><th>NX Post Builder Tab</th><th>Key Settings</th></tr>
+    <tr>
+      <td><strong>Machine</strong></td>
+      <td class="mono">4th axis: B, Table rotary, −180/+180, 0.001° resolution</td>
+    </tr>
+    <tr>
+      <td><strong>Program &amp; Tool Path</strong></td>
+      <td class="mono">Sequence numbers: N10 incr 10; Output G17/18/19: per-plane; Canned cycles: ON</td>
+    </tr>
+    <tr>
+      <td><strong>Linearization</strong></td>
+      <td class="mono">Tolerance: 0.001 mm; Max arc: 180°; Linear 4-axis: B only</td>
+    </tr>
+    <tr>
+      <td><strong>Word &amp; Format</strong></td>
+      <td class="mono">X/Y/Z: 4 decimals (mm) or 5 decimals (inch); B: 3 decimals; F: integer (mm/min)</td>
+    </tr>
+    <tr>
+      <td><strong>G-Code Mapping</strong></td>
+      <td class="mono">G43/G44 tool length; G49 cancel; G54-G59 work offsets; G68.2 tilted WCS (if enabled)</td>
+    </tr>
+  </table>
+</div>
+
+
+<!-- ════════ TAB: OPERATION TEMPLATES ════════ -->
+<div id="tab-operation-templates" class="tab">
+  <h1>NX Operation Templates — 4-Axis</h1>
+
+  <h2>3+1 Indexed Face Milling</h2>
+  <div class="code-wrap">
+    <div class="code-label">NX CAM — 3+1 Face Mill at B90°</div>
+    <pre><span class="cmt">( NX Setup: )</span>
+<span class="cmt">  Operation Type    : Face Milling (FACE_MILLING)</span>
+<span class="cmt">  Tool Axis         : +ZM (fixed, no tilting)</span>
+<span class="cmt">  B-Axis Angle      : 90.0° (set in Machine Control block)</span>
+<span class="cmt">  MCS               : G54 centered at B-axis pivot</span>
+<span class="cmt">  Non-Cutting Moves : Retract → G28 Z, then G28 X before B rotate</span>
+
+<span class="cmt">( Generated G-Code pattern: )</span>
+<span class="kw">T3 M6</span>                      <span class="cmt">; call face mill, ATC</span>
+<span class="kw">G43 H3 D3</span>                  <span class="cmt">; length + diameter compensation</span>
+<span class="kw">G91 G28 Z0</span>
+<span class="kw">G91 G28 X0 Y0</span>
+<span class="var">M11</span>
+<span class="kw">G90 G00 B90.000</span>           <span class="cmt">; index to Face 2</span>
+<span class="var">M10</span>                         <span class="cmt">; clamp B</span>
+<span class="kw">G54</span>
+<span class="kw">S800 M03</span>
+<span class="kw">G00 X-80. Y5. Z5.</span>
+<span class="kw">G01 Z-0.5 F100.</span>
+<span class="kw">G01 X80. F300.</span>
+<span class="kw">...</span>
+<span class="kw">G00 Z50.</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <h2>Drill Cycle with B-Axis Index</h2>
+  <div class="code-wrap">
+    <div class="code-label">G-Code — Drill 4 Faces (90° Index Increment)</div>
+    <pre><span class="cmt">( DRILL FACE 1 — B0° )</span>
+<span class="kw">T5 M6</span>
+<span class="kw">G43 H5</span>
+<span class="kw">G91 G28 Z0</span>
+<span class="var">M11</span>
+<span class="kw">G90 G00 B0.</span>
+<span class="var">M10</span>
+<span class="kw">G54</span>
+<span class="kw">S1200 M03</span>
+<span class="kw">G98 G81 X0. Y0. Z-30. R5. F120.</span>   <span class="cmt">; drill cycle</span>
+<span class="kw">X50. Y0.</span>
+<span class="kw">X-50. Y0.</span>
+<span class="kw">G80</span>
+
+<span class="cmt">( DRILL FACE 2 — B90° )</span>
+<span class="kw">G91 G28 Z0</span>
+<span class="kw">G91 G28 X0</span>
+<span class="var">M11</span>
+<span class="kw">G90 G00 B90.</span>
+<span class="var">M10</span>
+<span class="kw">G98 G81 X0. Y0. Z-30. R5. F120.</span>
+<span class="kw">X50. Y0.</span>
+<span class="kw">X-50. Y0.</span>
+<span class="kw">G80</span>
+
+<span class="cmt">( Repeat for B180 and B270... )</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <h2>4-Axis Continuous Contour</h2>
+  <div class="code-wrap">
+    <div class="code-label">G-Code — 4-Axis Continuous (Cam Profile)</div>
+    <pre><span class="cmt">( 4-AXIS CONTINUOUS — CAM PROFILE EXAMPLE )</span>
+<span class="cmt">( B-axis moves simultaneously with X )</span>
+<span class="kw">T12 M6</span>
+<span class="kw">G43 H12 D12</span>
+<span class="kw">S3000 M03</span>
+<span class="kw">G54</span>
+<span class="var">M11</span>                         <span class="cmt">; UNCLAMP — stays unclamped during cut</span>
+<span class="kw">G00 X0. Y-10. Z5. B0.</span>
+<span class="kw">G01 Z-5. F200.</span>
+<span class="kw">G01 X10.  B10.  F400.</span>     <span class="cmt">; simultaneous XB motion</span>
+<span class="kw">G01 X20.  B25.  F400.</span>
+<span class="kw">G01 X35.  B45.  F400.</span>
+<span class="kw">G01 X50.  B70.  F400.</span>
+<span class="kw">G01 X60.  B90.  F400.</span>
+<span class="kw">G00 Z50.</span>
+<span class="var">M10</span>                         <span class="cmt">; CLAMP after continuous cut</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <h2>NX Template Settings by Operation Type</h2>
+  <table class="tbl">
+    <tr><th>Operation</th><th>NX Type</th><th>Tool Axis</th><th>B Setting</th><th>Post Behavior</th></tr>
+    <tr><td>Face Mill (3+1)</td><td class="mono">FACE_MILLING</td><td>+ZM</td><td>Fixed angle in Machine Control</td><td>Index + clamp before ops</td></tr>
+    <tr><td>Pocket (3+1)</td><td class="mono">CAVITY_MILL</td><td>+ZM</td><td>Fixed angle in Machine Control</td><td>Index + clamp before ops</td></tr>
+    <tr><td>Contour (4-axis)</td><td class="mono">VARIABLE_CONTOUR</td><td>Relative/Interp</td><td>Continuous, per point</td><td>Simultaneous XB output</td></tr>
+    <tr><td>Drill (3+1)</td><td class="mono">DRILLING</td><td>+ZM</td><td>Fixed angle per cycle</td><td>G81/G83 + B index before</td></tr>
+    <tr><td>Bore (3+1)</td><td class="mono">BORING</td><td>+ZM</td><td>Fixed angle</td><td>G85/G86 + B index before</td></tr>
+    <tr><td>Thread Mill</td><td class="mono">THREAD_MILLING</td><td>+ZM</td><td>Fixed angle</td><td>Helical output G02/G03</td></tr>
+  </table>
+</div>
+
+
+<!-- ════════ TAB: SIM WORKFLOW ════════ -->
+<div id="tab-sim-workflow" class="tab">
+  <h1>Simulation Workflow — NX 2412</h1>
+  <p>Step-by-step procedure for running machine simulation (ISV) and G-Code simulation in NX 2412 for the NH550SX 4-axis setup.</p>
+
+  <h2>Method 1 — Integrated Simulation &amp; Verification (ISV)</h2>
+  <p>ISV runs the tool path directly inside NX using the MTB machine model. Best for catching collisions before posting.</p>
+
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Open ISV from Operation Navigator</h4>
+        <p>Select one or more operations in the Operation Navigator. Right-click → <strong>Simulate → Simulate Machine</strong>. The ISV window opens with the machine model loaded.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Confirm Machine Loaded</h4>
+        <p>In the ISV panel, verify <strong>Machine</strong> shows <code>TOYODA_NH550SX</code>. If blank: Machine panel → <strong>Load Machine</strong> → browse to your .mtx file. The 3D machine model should appear in the graphics window.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Set Stock and Fixture</h4>
+        <p>In ISV: <strong>Setup</strong> tab → <strong>Stock Body</strong> → select your stock geometry from the part. <strong>Fixture</strong> → select fixture bodies. These are used for collision and material removal display.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Run Simulation</h4>
+        <p>Press <strong>Play (▶)</strong> or use the step-forward button for single-block simulation. Use the <strong>Speed</strong> slider to control animation speed. Watch for red collision highlights on the machine model.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Review B-Axis Motion</h4>
+        <p>At each B-axis index event, the simulation should show: (1) linear axes retract, (2) B rotates, (3) linear axes approach new position. If the machine collides during B rotation, add more retract clearance in non-cutting moves.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Check Collision Report</h4>
+        <p>After simulation: <strong>Results</strong> tab → <strong>Collision List</strong>. Expand each collision to see which bodies collide and at which program block. Fix by editing the operation's retract/approach clearance, then re-simulate.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Method 2 — G-Code Simulation</h2>
+  <p>G-Code Sim reads the posted NC file. Use this to verify the exact code that will run on the machine.</p>
+
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Post the NC Program</h4>
+        <p>In Operation Navigator: select all operations → right-click → <strong>Post Process</strong>. Select post <code>nh550sx_fanuc30i</code>. Output to a known directory (e.g., <code>C:\NC\NH550SX\</code>).</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Open G-Code Sim</h4>
+        <p><code>Menu → Manufacturing → G-Code Simulation</code>. Load the .nc file: <strong>File → Open NC File</strong>. Select machine: <code>TOYODA_NH550SX</code> (same .mtx as ISV).</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Map Work Offsets</h4>
+        <p>In G-Code Sim: <strong>Offsets</strong> tab → enter G54 values matching your control setup page. These must match the actual machine offsets for accurate position verification.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Run and Verify</h4>
+        <p>Press <strong>Cycle Start</strong>. The simulation reads G-code block-by-block. B-axis moves will animate the rotary table. The DRO panel shows live machine coordinates — compare to expected G53 positions.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Compare to Nominal</h4>
+        <p>After completing the simulation: <strong>Compare</strong> tab → load nominal part model → run deviation analysis. Deviations shown as color map. Max allowable deviation = your part tolerance minus half your stock allowance.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <strong>Simulation Best Practice</strong>
+    <p>Always run ISV first (catches NX-level path issues), then post and run G-Code Sim (catches post processor issues). Both must pass before sending a new program to the machine. G-Code Sim is the final gatekeeper.</p>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: COLLISION SETUP ════════ -->
+<div id="tab-collision" class="tab">
+  <h1>Collision Setup — B-Axis Swing</h1>
+
+  <h2>Critical Collision Pairs</h2>
+  <table class="tbl">
+    <tr><th>Body A</th><th>Body B</th><th>Risk</th><th>Mitigation</th></tr>
+    <tr><td>Spindle Head</td><td>Rotary Table Body</td><td class="warn">High</td><td>Retract Z to G28 before any B move</td></tr>
+    <tr><td>Tool / Holder</td><td>Tombstone Fixture</td><td class="warn">High</td><td>Full Z+XY retract before B rotation</td></tr>
+    <tr><td>Spindle Nose</td><td>T-slot Table Bolts</td><td class="warn">Medium</td><td>Model bolts in fixture geometry</td></tr>
+    <tr><td>Tool Holder Body</td><td>Workpiece Corner</td><td class="warn">Medium</td><td>Add holder to collision check; verify in ISV</td></tr>
+    <tr><td>Coolant Manifold</td><td>Fixture Clamps</td><td class="note">Low</td><td>Model high-profile clamps; check at B=±90</td></tr>
+    <tr><td>ATC Arm</td><td>Tool in Spindle</td><td class="ok">Handled</td><td>Machine handles ATC timing — do not override M6</td></tr>
+  </table>
+
+  <h2>B-Axis Swing Envelope</h2>
+  <div class="code-wrap">
+    <div class="code-label">Minimum Clearance Zones — Verify These in ISV</div>
+    <pre><span class="cmt">Spindle nose to table surface @ B=0°  →  measure min Z clearance at G28 XY pos</span>
+<span class="cmt">Longest tool in spindle, B=90°        →  tool tip vs. table body left edge</span>
+<span class="cmt">Widest face mill, B=0°                →  cutter OD vs. fixture riser</span>
+<span class="cmt">Tombstone @ B=45° (diagonal)          →  check all 4 corners during B rotation</span>
+<span class="cmt">Boring bar (extended), B=180°         →  tool tip vs. pallet receiver pocket</span>
+
+<span class="cmt">Safe Rule:  G91 G28 Z0  →  G91 G28 X0  before ANY B motion</span>
+<span class="cmt">Exception:  Only skip XY retract if ISV confirms clearance at ALL B angles</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+
+  <h2>Adding Fixture Geometry to ISV</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Create Fixture Bodies in Part</h4>
+        <p>Model your vise, tombstone, or custom fixture in the NX part file as solid bodies. Name them clearly: <code>FIXTURE_VISE</code>, <code>TOMBSTONE_400H</code>, etc.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Assign in CAM Setup</h4>
+        <p>In Operation Navigator → CAM Setup → <strong>Edit</strong> → <strong>Simulation</strong> tab → <strong>Fixture Bodies</strong> → select your fixture solids. These attach to the B-axis node during simulation.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Verify B-Axis Attachment</h4>
+        <p>In ISV, manually jog B to ±90°. Confirm the fixture body rotates with the table (it should, since it's assigned as fixture which attaches to the B-node). If it stays fixed, re-check the MTB kinematic assignment.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <strong>Tombstone Height Warning</strong>
+    <p>A 400 mm tall tombstone on the NH550SX table can reduce effective swing clearance to zero at B=±90°. Always model your tallest fixture and check the spindle/head collision at ±90° before relying on G28 Z-only retract. You may need G28 X as well.</p>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: VERIFICATION ════════ -->
+<div id="tab-verification" class="tab">
+  <h1>Tool Path Verification</h1>
+
+  <h2>NX Verify Tool Path</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Run Verify on All Operations</h4>
+        <p>Select all ops in Navigator → right-click → <strong>Verify Tool Path</strong>. In the Verify dialog: enable <strong>Gouge Check</strong>, <strong>Excess Material</strong>, and <strong>IPW (In-Process Workpiece)</strong>.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Check for Gouges</h4>
+        <p>Verify colors: <span style="color:#3fb950">Green = cut</span>, <span style="color:#f85149">Red = gouge</span>, <span style="color:#e3b341">Yellow = excess</span>. Any red areas must be investigated. Common cause in 4-axis: tool axis not correctly aligned to face normal at the index angle.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Verify B-Axis Undercut Risk</h4>
+        <p>In 4-axis continuous, the tool can undercut the workpiece if B drives the part surface back into the tool. Enable <strong>Rotary Undercut Check</strong> in Verify settings. Any undercut will show as a gouge.</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>Review IPW Between Ops</h4>
+        <p>Use the IPW (in-process workpiece) to carry material state between operations. This shows actual remaining stock after each op. Critical for planning B-axis indexing order — machine faces with most stock first.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Gouge Check Settings for 4-Axis</h2>
+  <table class="tbl">
+    <tr><th>Setting</th><th>Value</th><th>Notes</th></tr>
+    <tr><td>Gouge Tolerance</td><td class="mono">0.01 mm</td><td class="note">Tighten to 0.005 for finish ops</td></tr>
+    <tr><td>Check Holder</td><td class="mono ok">ON</td><td class="note">Must be on for 4-axis — holders can collide on index</td></tr>
+    <tr><td>Check Stock</td><td class="mono ok">ON</td><td class="note">Compare to nominal model, not just raw stock</td></tr>
+    <tr><td>4-Axis Undercut</td><td class="mono ok">ON</td><td class="note">Essential for continuous B-axis operations</td></tr>
+    <tr><td>Compare to Design</td><td class="mono">Optional</td><td class="note">Load nominal .prt to color-map deviation</td></tr>
+  </table>
+
+  <h2>Post-Simulation Signoff Checklist</h2>
+  <ul class="checklist">
+    <li>ISV ran to completion with 0 collisions reported</li>
+    <li>G-Code Sim ran to completion with 0 collisions reported</li>
+    <li>All B-axis index moves preceded by Z retract to G28</li>
+    <li>All B-axis index moves followed by M10 clamp before any cutting</li>
+    <li>Program header contains G17 G40 G49 G80 G90 safety block</li>
+    <li>Tool length offsets match presetter data (H numbers)</li>
+    <li>Work offset G54 verified to match machine setup sheet</li>
+    <li>Verify Tool Path shows 0 gouges on all operations</li>
+    <li>IPW shows correct remaining stock between each operation group</li>
+    <li>Coolant codes (M08/M09) present in each operation</li>
+    <li>Feed rates reviewed — no excessively high 4-axis combined feedrate</li>
+    <li>Tool change sequences verified — G91 G28 Z0 before each T_ M6</li>
+    <li>Program tested by experienced machinist or ME before first run</li>
+    <li>First-article inspection planned for first production piece</li>
+  </ul>
+</div>
+
+
+<!-- ════════ TAB: G-CODE REFERENCE ════════ -->
+<div id="tab-gcode-ref" class="tab">
+  <h1>G-Code Reference — NH550SX / Fanuc 30i-B</h1>
+
+  <h2>Common G-Codes</h2>
+  <table class="tbl">
+    <tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+    <tr><td class="mono">G00</td><td>Rapid Positioning</td><td class="note">All axes including B; use only in safe positions for B rapid</td></tr>
+    <tr><td class="mono">G01</td><td>Linear Feed</td><td class="note">4-axis simultaneous: G01 X_ B_ F_</td></tr>
+    <tr><td class="mono">G02/G03</td><td>Circular Interpolation</td><td class="note">XY/XZ/YZ planes — B cannot interpolate with circular</td></tr>
+    <tr><td class="mono">G04</td><td>Dwell</td><td class="note">G04 P500 = 500 ms dwell (use after B clamp if needed)</td></tr>
+    <tr><td class="mono">G17/18/19</td><td>Plane Select XY/XZ/YZ</td><td class="note">G17 (XY) is default; must match arc plane</td></tr>
+    <tr><td class="mono">G20/G21</td><td>Inch / Metric</td><td class="note">Set in header; do not change mid-program</td></tr>
+    <tr><td class="mono">G28</td><td>Return to Reference Point</td><td class="note">G91 G28 Z0 → G91 G28 X0 Y0 before B index</td></tr>
+    <tr><td class="mono">G40/41/42</td><td>Cutter Comp Cancel/Left/Right</td><td class="note">G40 always in header and after comp ops</td></tr>
+    <tr><td class="mono">G43/44/49</td><td>Tool Length Comp +/−/Cancel</td><td class="note">G43 H_ after every tool change; G49 in footer</td></tr>
+    <tr><td class="mono">G54–G59</td><td>Work Offsets 1–6</td><td class="note">G54 = primary setup; G55–G59 optional per face</td></tr>
+    <tr><td class="mono">G68.2</td><td>Tilted Work Plane</td><td class="note">3+2 indexed programming; uses B-axis angle in WPD</td></tr>
+    <tr><td class="mono">G80</td><td>Cancel Canned Cycle</td><td class="note">Always cancel before non-drilling moves</td></tr>
+    <tr><td class="mono">G90/G91</td><td>Absolute / Incremental</td><td class="note">G91 only for G28 reference returns; back to G90 after</td></tr>
+    <tr><td class="mono">G94/G95</td><td>Feed per Min / Feed per Rev</td><td class="note">G94 default; G95 for boring with constant chip load</td></tr>
+    <tr><td class="mono">G98/G99</td><td>Canned Cycle Return to R / Initial</td><td class="note">G98 (initial level) recommended for 4-axis drilling</td></tr>
+  </table>
+
+  <h2>M-Codes — NH550SX Specific</h2>
+  <table class="tbl">
+    <tr><th>M-Code</th><th>Function</th><th>Timing</th></tr>
+    <tr><td class="mono ok">M03</td><td>Spindle CW</td><td class="note">Followed by S code; spindle accelerates</td></tr>
+    <tr><td class="mono">M04</td><td>Spindle CCW</td><td class="note">For left-hand tools or tapping</td></tr>
+    <tr><td class="mono">M05</td><td>Spindle Stop</td><td class="note">In footer before M30</td></tr>
+    <tr><td class="mono">M06</td><td>Tool Change (ATC)</td><td class="note">Machine auto-cycles ATC; must have G28 Z before</td></tr>
+    <tr><td class="mono ok">M08</td><td>Coolant On (Flood)</td><td class="note">After spindle start, before cutting move</td></tr>
+    <tr><td class="mono">M09</td><td>Coolant Off</td><td class="note">Before G28 retract at end of op</td></tr>
+    <tr><td class="mono warn">M10</td><td>B-Axis Clamp</td><td class="note">After G00 B to target angle; before any cutting</td></tr>
+    <tr><td class="mono warn">M11</td><td>B-Axis Unclamp</td><td class="note">Before any G00/G01 on B; after retract</td></tr>
+    <tr><td class="mono">M19</td><td>Spindle Orient</td><td class="note">Auto within ATC cycle; rarely programmed manually</td></tr>
+    <tr><td class="mono">M30</td><td>Program End &amp; Rewind</td><td class="note">Always last block</td></tr>
+    <tr><td class="mono">M52</td><td>Pallet Clamp</td><td class="note">APC operations only</td></tr>
+    <tr><td class="mono">M53</td><td>Pallet Unclamp</td><td class="note">APC operations only</td></tr>
+    <tr><td class="mono">M98</td><td>Subprogram Call</td><td class="note">M98 P_; subprogram ends with M99</td></tr>
+    <tr><td class="mono">M99</td><td>Subprogram Return</td><td class="note">Last block of subprogram</td></tr>
+  </table>
+
+  <h2>Canned Cycles — Key Parameters</h2>
+  <div class="code-wrap">
+    <div class="code-label">Canned Cycle Quick Reference</div>
+    <pre><span class="kw">G81</span> X_ Y_ Z_ R_ F_          <span class="cmt">; Standard drill</span>
+<span class="kw">G83</span> X_ Y_ Z_ R_ Q_ F_       <span class="cmt">; Peck drill (Q=peck depth)</span>
+<span class="kw">G84</span> X_ Y_ Z_ R_ F_          <span class="cmt">; Right-hand tap (F = pitch × RPM)</span>
+<span class="kw">G85</span> X_ Y_ Z_ R_ F_          <span class="cmt">; Bore in, feed out</span>
+<span class="kw">G86</span> X_ Y_ Z_ R_ F_          <span class="cmt">; Bore in, spindle stop, rapid out</span>
+<span class="kw">G76</span> X_ Y_ Z_ R_ Q_ P_ F_   <span class="cmt">; Fine bore (Q=shift, P=dwell)</span>
+<span class="kw">G87</span> X_ Y_ Z_ R_ Q_ F_       <span class="cmt">; Back bore</span>
+
+<span class="cmt">All canned cycles: cancel with G80 before non-hole moves</span>
+<span class="cmt">For 4-axis drilling: use G98 (return to initial Z level) at all B positions</span></pre>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+</div>
+
+
+<!-- ════════ TAB: TROUBLESHOOTING ════════ -->
+<div id="tab-troubleshoot" class="tab">
+  <h1>Troubleshooting</h1>
+
+  <h2>NX MTB / Machine Builder Issues</h2>
+  <table class="tbl">
+    <tr><th>Problem</th><th>Likely Cause</th><th>Fix</th></tr>
+    <tr>
+      <td>Machine doesn't appear in ISV</td>
+      <td class="note">.mtx not in library path</td>
+      <td class="note">Copy .mtx to <code>UGII_CAM_LIBRARY_DIR\machines\</code>; restart NX</td>
+    </tr>
+    <tr>
+      <td>B-axis doesn't rotate in ISV</td>
+      <td class="note">Joint not connected to geometry node</td>
+      <td class="note">In MTB: verify B_AXIS joint has geometry assigned and is in kinematic tree</td>
+    </tr>
+    <tr>
+      <td>Fixture stays fixed while table rotates</td>
+      <td class="note">Fixture not assigned to B-axis node</td>
+      <td class="note">In CAM Setup: Fixture Bodies must be assigned; or add fixture to MTB B-axis node</td>
+    </tr>
+    <tr>
+      <td>False collisions at B=0°</td>
+      <td class="note">Machine geometry origin mismatch</td>
+      <td class="note">Verify MTB geometry is positioned at true machine zero, not model origin</td>
+    </tr>
+    <tr>
+      <td>ISV shows wrong material removal</td>
+      <td class="note">Stock body not assigned</td>
+      <td class="note">ISV Setup tab → Stock Body → select correct solid</td>
+    </tr>
+  </table>
+
+  <h2>Post Processor Issues</h2>
+  <table class="tbl">
+    <tr><th>Problem</th><th>Likely Cause</th><th>Fix</th></tr>
+    <tr>
+      <td>B not in output at all</td>
+      <td class="note">4th axis not enabled in post</td>
+      <td class="note">Post Builder: Machine tab → enable 4th axis B; rebuild post</td>
+    </tr>
+    <tr>
+      <td>M10/M11 missing in NC</td>
+      <td class="note">Clamp event not in MOM handler</td>
+      <td class="note">Add M10/M11 in <code>MOM_rotary_axis_index</code> event or custom template</td>
+    </tr>
+    <tr>
+      <td>B goes wrong direction</td>
+      <td class="note">Post sign convention inverted</td>
+      <td class="note">In Post Builder: 4th Axis → invert output sign; or negate B in post template</td>
+    </tr>
+    <tr>
+      <td>B exceeds ±180° in output</td>
+      <td class="note">Shortest-path not selected</td>
+      <td class="note">Post Builder: 4th Axis → Shortest Rotation = Yes</td>
+    </tr>
+    <tr>
+      <td>Feed F=0 on 4-axis blocks</td>
+      <td class="note">Rotary feed not mapped</td>
+      <td class="note">In post: linear_move block must include F word; check feed mode G94 is active</td>
+    </tr>
+  </table>
+
+  <h2>Machine / Control Issues</h2>
+  <table class="tbl">
+    <tr><th>Alarm / Symptom</th><th>Cause</th><th>Action</th></tr>
+    <tr><td class="warn">B-axis overtravel alarm</td><td class="note">Program went past ±180° limit</td><td class="note">Check post shortest-path; verify B values in NC file</td></tr>
+    <tr><td class="warn">M10 before B settled</td><td class="note">Timing issue — clamp before B done</td><td class="note">Add G04 P300 dwell between G00 B_ and M10</td></tr>
+    <tr><td class="warn">Chatter on 4-axis pass</td><td class="note">B unclamped, low rigidity</td><td class="note">Only use continuous 4-axis for light finishing; roughing must be 3+1 clamped</td></tr>
+    <tr><td class="warn">Part shifts between B-faces</td><td class="note">Work offset wrong for rotary datum</td><td class="note">Verify G54 is at B-axis center; probe datum at B=0 and compare at B=90</td></tr>
+    <tr><td class="warn">ATC error after B move</td><td class="note">B not at 0° for tool change</td><td class="note">Program must return B=0 before T_ M6; or set ATC position in machine parameter</td></tr>
+  </table>
+</div>
+
+
+<!-- ════════ TAB: CHECKLIST ════════ -->
+<div id="tab-checklist" class="tab">
+  <h1>Pre-Run Checklist — NH550SX 4th Axis</h1>
+  <p>Complete before running any new 4-axis program on the NH550SX for the first time.</p>
+
+  <h2>NX CAM / Simulation</h2>
+  <ul class="checklist">
+    <li>Machine model TOYODA_NH550SX loaded in ISV — kinematic tree verified</li>
+    <li>ISV completed without collisions for all operations</li>
+    <li>G-Code Simulation completed without collisions using posted NC file</li>
+    <li>NX Verify shows zero gouges — all operations</li>
+    <li>B-axis pivot offset confirmed against physical machine measurement</li>
+    <li>Tool holders modeled in NX with correct gauge length from presetter</li>
+    <li>Fixture geometry added to simulation — all clamps and risers included</li>
+    <li>Tombstone / fixture swing envelope cleared at B = 0, ±45, ±90, ±135, ±180</li>
+  </ul>
+
+  <h2>Post Processor / NC Code</h2>
+  <ul class="checklist">
+    <li>NC program reviewed in text editor — B values plausible for each face</li>
+    <li>M11 (unclamp) present before every B motion</li>
+    <li>M10 (clamp) present after every B index, before first cutting move</li>
+    <li>G91 G28 Z0 executed before every B rotation</li>
+    <li>G91 G28 X0 Y0 executed before B rotation (verify sufficient with sim)</li>
+    <li>Tool change sequence: G28 Z → T_ M6 → G43 H_ — correct order</li>
+    <li>Safety block G17 G40 G49 G80 G90 at program start</li>
+    <li>M30 at end of program</li>
+    <li>Feed rates within machine limits (B rapid ≤ 900 deg/min, cuts per data)</li>
+  </ul>
+
+  <h2>Machine Setup</h2>
+  <ul class="checklist">
+    <li>Work offset G54 set and verified (probe or indicator at B=0)</li>
+    <li>G54 origin confirmed to be at or referenced to B-axis center</li>
+    <li>All tools loaded, measured on presetter, offsets entered (H and D numbers)</li>
+    <li>Fixture torqued to spec on rotary table — all T-bolts checked</li>
+    <li>B-axis zero return performed (reference point return G28 B0)</li>
+    <li>Pallet clamped — M52 confirmed if APC in use</li>
+    <li>Chip conveyor and coolant running — drain not blocked</li>
+    <li>Machine door closed and safety interlock armed</li>
+  </ul>
+
+  <h2>First-Run Protocol</h2>
+  <ul class="checklist">
+    <li>DRYRUN mode enabled for first full run — verify positions visually</li>
+    <li>Single-block mode ON — advance block-by-block through first B index</li>
+    <li>Feed Hold ready — operator hand on button through first B rotation</li>
+    <li>After DRYRUN: reset, remove dryrun, run with 50% override</li>
+    <li>First part inspected fully — all features on all B-faces measured</li>
+    <li>Program signed off by ME or lead machinist before production release</li>
+  </ul>
+
+  <div class="callout danger">
+    <strong>No Shortcuts on First Run</strong>
+    <p>Every new 4-axis program must complete DRYRUN before cutting. B-axis rotation with fixtures in the envelope is one of the highest-risk machine moves. A collision at B-axis rapid speed will damage the rotary table clamp, the spindle, and potentially the machine. The 5 minutes for DRYRUN is always worth it.</p>
+  </div>
+</div>
+
+</main>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function copyCode(btn) {
+  const pre = btn.previousElementSibling;
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

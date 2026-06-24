@@ -1,0 +1,270 @@
+============================================================
+  NH550SX — NX 2412 CAM Template & Operation Setup Guide
+  Machine : Toyoda NH550SX HMC
+  Control : Fanuc 30i-B
+  Axes    : 4 (X Y Z B)
+============================================================
+
+────────────────────────────────────────────────────────────
+SECTION 1 — CAM SESSION SETUP (MCS / WCS)
+────────────────────────────────────────────────────────────
+
+1.1  Enter Manufacturing:
+     Application → Manufacturing → cam_general
+
+1.2  Create CAM Setup:
+     Operation Navigator (right-click) → Insert → Setup
+
+1.3  MCS Settings:
+     ┌─────────────────────────────────────────────────────┐
+     │  MCS Name       : MCS_NH550SX                       │
+     │  Origin         : B-axis center (pallet top surface)│
+     │  X axis         : Machine +X                        │
+     │  Y axis         : Machine +Y (vertical)             │
+     │  Z axis         : Machine +Z (toward spindle)       │
+     │  Rotary Axis    : +Y (B rotates about Y)            │
+     │  Pivot Distance : [measured from part zero to B ctr]│
+     │  Work Offset    : G54                               │
+     └─────────────────────────────────────────────────────┘
+
+1.4  Pivot Distance Calculation:
+     If G54 Z = top of part, and B-axis center = table surface:
+       If part is 200 mm tall and G54 is at top:
+         Pivot offset in Y = -200 mm from G54 origin
+       Measure precisely with indicator on machine
+
+1.5  Machine Tool:
+     Machine Tool tab → Select Machine : TOYODA_NH550SX
+     (loads the .mtx file for ISV simulation)
+
+1.6  Post Processor:
+     Post Processor tab → Browse → select nh550sx_fanuc30i.tcl
+
+
+────────────────────────────────────────────────────────────
+SECTION 2 — WORKPIECE / STOCK SETUP
+────────────────────────────────────────────────────────────
+
+2.1  Specify Part Geometry:
+     CAM Setup → Part → select finished part solid
+
+2.2  Specify Stock:
+     CAM Setup → Blank → Block or offset from part
+     Stock offset (typical): 3 mm per face for roughing setup
+
+2.3  Specify Fixtures for ISV:
+     CAM Setup → Check Bodies → select fixture solids
+     These are collision-checked during ISV simulation
+
+2.4  Simulation Stock:
+     ISV reads the CAM Setup stock body automatically
+     For G-Code Sim: define stock in the G-Code Sim dialog
+
+
+────────────────────────────────────────────────────────────
+SECTION 3 — TOOL SETUP
+────────────────────────────────────────────────────────────
+
+3.1  Create Tool Group in Operation Navigator:
+     Right-click → Insert → Tool
+
+3.2  Essential Tool Parameters:
+     ┌─────────────────────────────────┬────────────────────┐
+     │ Parameter                       │ Entry              │
+     ├─────────────────────────────────┼────────────────────┤
+     │ Tool Number (T#)                │ Match machine ATC  │
+     │ Length Offset (H#)              │ Match T# (standard)│
+     │ Diameter Offset (D#)            │ Match T# (standard)│
+     │ Gauge Length                    │ Presetter value    │
+     │ Holder Type                     │ BT50 or HSK-A100   │
+     │ Holder Projection               │ Presetter value    │
+     │ Holder Diameter (at flange)     │ Per holder spec    │
+     └─────────────────────────────────┴────────────────────┘
+
+3.3  Holder Library:
+     Use NX tool library holders or import from Capto/BT50 library
+     CRITICAL: Holder geometry must be accurate for 4-axis
+     collision detection during B-axis indexing
+
+
+────────────────────────────────────────────────────────────
+SECTION 4 — OPERATION TEMPLATES
+────────────────────────────────────────────────────────────
+
+4.1  3+1 INDEXED — FACE MILLING
+     ─────────────────────────────────────────────────────
+     Operation Type   : FACE_MILLING
+     Tool Axis        : +ZM (fixed, perpendicular to face)
+     Cut Method       : Zig Zag or Follow Part
+     B-Axis Angle     : Set in Machine Control block
+                        Non-Cutting Moves → Engage/Retract
+                        → Add Machine Control Event:
+                          Type: Rotary Axis Index
+                          Value: 90.0 (example for Face 2)
+     Stepover         : 80% of tool diameter
+     Depth of Cut     : 0.5–3.0 mm (per material)
+
+4.2  3+1 INDEXED — CAVITY MILLING (POCKET)
+     ─────────────────────────────────────────────────────
+     Operation Type   : CAVITY_MILL
+     Tool Axis        : +ZM
+     Cut Method       : Follow Part or Climb
+     Step Depth       : Per material / tool data
+     Floor Stock      : 0.2 mm (leave for finish)
+     Wall Stock       : 0.3 mm (leave for finish)
+     B-Angle          : Same as above via Machine Control
+
+4.3  3+1 INDEXED — DRILLING
+     ─────────────────────────────────────────────────────
+     Operation Type   : DRILLING
+     Tool Axis        : +ZM
+     Cycle Type       : Standard Drill (G81) or Peck (G83)
+     Depth Method     : Through (add through-distance)
+     B-Angle          : Machine Control event before cycle
+     NOTE: Post outputs G98 (return to initial Z) for safety
+
+4.4  4-AXIS CONTINUOUS — VARIABLE CONTOUR
+     ─────────────────────────────────────────────────────
+     Operation Type   : VARIABLE_CONTOUR
+     Drive Method     : Surface / Flowline / Streamline
+     Tool Axis        : Relative to Drive (tilts with surface)
+                    OR : Interpolate (between start/end vectors)
+     Linearization    : 0.001 mm tolerance (critical)
+     4th Axis         : B — simultaneous with XYZ
+     Clamp            : DO NOT clamp B during continuous cuts
+                        (post outputs M11 at start, M10 at end)
+     Feeds            : Use combined vector feed from NX
+                        Typical: 300–800 mm/min for finishing
+
+4.5  DEEP HOLE DRILLING WITH INDEX
+     ─────────────────────────────────────────────────────
+     For deep holes in tombstone faces:
+     1. Index to face (B = 0/90/180/270)
+     2. Use DRILLING op with G83 peck cycle
+     3. Chip clearance: Q = 2–3× drill diameter per peck
+     4. Full retract between pecks (G98)
+     5. Flood coolant M08 — ensure coolant direction at angle
+
+
+────────────────────────────────────────────────────────────
+SECTION 5 — NON-CUTTING MOVES (RETRACT / APPROACH)
+────────────────────────────────────────────────────────────
+
+5.1  Retract (end of operation, before B index):
+     Type     : Radial then Axial
+     Radial   : 10 mm from part
+     Axial    : Clearance plane = 50 mm above highest feature
+     After clearance: Automatic Z Home (G91 G28 Z0)
+
+5.2  Transfer / Rapid between operations:
+     Transfer Type : Machine Axis (go via G28 positions)
+     Avoid : Direct tool path moves that cross B-axis envelope
+
+5.3  Approach (after B index, to new face):
+     Safe distance : 20–50 mm from face
+     From : Clearance plane → Engage point → start of cut
+
+5.4  Template Non-Cutting Move Block:
+     Retract Z → Retract XY (if needed) → B Index →
+     Approach XY → Approach Z to clearance → Engage cut
+
+
+────────────────────────────────────────────────────────────
+SECTION 6 — MULTI-FACE 4-SIDE PROGRAM STRUCTURE
+────────────────────────────────────────────────────────────
+
+Recommended operation group structure in Navigator:
+
+  PROGRAM_NH550SX_4SIDE
+  ├── TOOL_CHANGE_GROUP (tool 1 — face mill)
+  │   ├── OP_FACE1_ROUGH   B=0°
+  │   ├── OP_FACE2_ROUGH   B=90°
+  │   ├── OP_FACE3_ROUGH   B=180°
+  │   └── OP_FACE4_ROUGH   B=270°
+  ├── TOOL_CHANGE_GROUP (tool 2 — end mill)
+  │   ├── OP_FACE1_POCKET  B=0°
+  │   ├── OP_FACE2_POCKET  B=90°
+  │   └── ...
+  └── TOOL_CHANGE_GROUP (tool 3 — drill)
+      ├── OP_FACE1_DRILL   B=0°
+      └── ...
+
+Benefits of this structure:
+  - Minimizes B-axis index count (complete all ops at one face
+    with each tool before indexing to next face)
+  - Reduces ATC cycles (tool changes only when tool changes)
+  - Easier to split into separate programs per face if needed
+
+Alternative (Face-First grouping):
+  FACE_1_GROUP (B=0°) → all tools at face 1
+  FACE_2_GROUP (B=90°) → all tools at face 2
+  → More B indexes, more ATC, but easier for setup/verify
+
+
+────────────────────────────────────────────────────────────
+SECTION 7 — GENERATE, VERIFY, AND POST
+────────────────────────────────────────────────────────────
+
+7.1  Generate All Operations:
+     Select all ops in Navigator
+     Right-click → Generate
+     Wait for all to complete (green checkmarks)
+
+7.2  Verify Tool Path:
+     Select all ops → Right-click → Verify Tool Path
+     Settings:
+       ✓ Gouge Check ON
+       ✓ Check Holder ON
+       ✓ 4-Axis Undercut Check ON
+       ✓ IPW (In-Process Workpiece) ON
+     No red areas = pass
+
+7.3  Simulate Machine (ISV):
+     Select all ops → Right-click → Simulate → Simulate Machine
+     Machine: TOYODA_NH550SX (auto from CAM setup)
+     Assign: Stock Body, Fixture Bodies
+     Press Play — verify zero collisions
+
+7.4  Post Process:
+     Select all ops → Right-click → Post Process
+     Post: nh550sx_fanuc30i
+     Output File: [part_name]_NH550SX.nc
+     Output Units: Millimeters (G21)
+     Review NC file — check B values, M10/M11, G28 sequences
+
+7.5  G-Code Simulation:
+     Menu → Manufacturing → G-Code Simulation
+     Load NC file → Map G54 → Run
+     Confirm machine positions match expected values
+
+7.6  Sign-off:
+     Simulation engineer signs ISV report
+     ME or lead machinist reviews NC file
+     First run on machine: DRYRUN + single-block
+
+
+────────────────────────────────────────────────────────────
+SECTION 8 — QUICK SETTINGS CHECKLIST FOR NEW SETUPS
+────────────────────────────────────────────────────────────
+
+  □  MCS origin at B-axis center with correct pivot offset
+  □  Machine Tool: TOYODA_NH550SX selected
+  □  Post: nh550sx_fanuc30i selected
+  □  Work Offset: G54
+  □  Rotary Axis: +Y vector, pivot = measured offset
+  □  All tool holders modeled with accurate gauge lengths
+  □  Stock defined: 3 mm per face offset from nominal
+  □  Fixture geometry added as Check Bodies
+  □  Non-cutting moves: Retract to clearance → G28 Z before B
+  □  B-Axis Machine Control events in each op that changes face
+  □  Operations grouped Tool-First (minimize index count)
+  □  All ops generated (green checkmarks)
+  □  Verify Tool Path: 0 gouges
+  □  ISV: 0 collisions
+  □  NC file reviewed
+  □  G-Code Sim: 0 collisions
+
+
+============================================================
+END OF CAM TEMPLATE GUIDE
+============================================================
