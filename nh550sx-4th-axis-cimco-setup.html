@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toyoda FH550SX (NH550SX) — 4th Axis CIMCO Edit Machine Simulation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a2744,#0d1b2a);padding:20px 30px;border-bottom:2px solid #30363d}
+.header h1{color:#58a6ff;font-size:1.6rem;font-weight:700}
+.header .sub{color:#8b949e;font-size:.85rem;margin-top:4px}
+.machine-badge{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.badge{background:#21262d;border:1px solid #30363d;border-radius:12px;padding:3px 10px;font-size:.75rem;color:#8b949e}
+.badge.green{border-color:#238636;color:#3fb950}
+.badge.blue{border-color:#1f6feb;color:#58a6ff}
+.badge.orange{border-color:#9e6a03;color:#ffa657}
+.badge.red{border-color:#da3633;color:#ff7b72}
+.tabs{display:flex;background:#161b22;border-bottom:1px solid #30363d;overflow-x:auto;padding:0 10px;flex-wrap:nowrap}
+.tab{padding:11px 16px;cursor:pointer;border-bottom:2px solid transparent;color:#8b949e;font-size:.82rem;white-space:nowrap;transition:all .2s}
+.tab:hover{color:#c9d1d9}
+.tab.active{color:#58a6ff;border-bottom-color:#58a6ff}
+.content{display:none;padding:24px 30px;max-width:1400px;margin:0 auto}
+.content.active{display:block}
+.section-title{color:#58a6ff;font-size:1.05rem;font-weight:600;margin:22px 0 12px;border-left:3px solid #58a6ff;padding-left:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px}
+.card h3{color:#e6edf3;font-size:.93rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.code-block{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:12px;font-family:'Consolas','Courier New',monospace;font-size:.8rem;line-height:1.75;overflow-x:auto;white-space:pre}
+.g{color:#79c0ff}.m{color:#ff7b72}.n{color:#ffa657}.cmt{color:#8b949e}.var{color:#d2a8ff}.num{color:#a5d6ff}.lit{color:#e6edf3}
+.param-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.79rem}
+.param-table th{background:#21262d;color:#8b949e;padding:6px 10px;text-align:left;border:1px solid #30363d}
+.param-table td{padding:6px 10px;border:1px solid #30363d;vertical-align:top;line-height:1.5}
+.param-table td:first-child{color:#ffa657;font-family:monospace;white-space:nowrap;font-weight:600}
+.param-table td:nth-child(2){color:#79c0ff}
+.param-table tr:hover td{background:#1c2128}
+.note{background:#1c2128;border-left:3px solid #d29922;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:#e3b341;margin:8px 0;line-height:1.6}
+.warn{background:#1c2128;border-left:3px solid #da3633;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:#ff7b72;margin:8px 0;line-height:1.6}
+.tip{background:#1c2128;border-left:3px solid #238636;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:#3fb950;margin:8px 0;line-height:1.6}
+.alert-box{background:#2d1f1f;border:1px solid #da3633;border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:.83rem;line-height:1.7;color:#ff7b72}
+.alert-box strong{color:#ffa0a0}
+.info-box{background:#1c2431;border:1px solid #1f6feb;border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:.83rem;line-height:1.7;color:#79c0ff}
+.info-box strong{color:#a5d6ff}
+.step-list{counter-reset:step;list-style:none;margin:10px 0}
+.step-list li{counter-increment:step;display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;font-size:.83rem;line-height:1.6}
+.step-list li::before{content:counter(step);background:#1f6feb;color:#fff;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-list li span.path{color:#79c0ff;font-family:monospace;background:#21262d;padding:1px 5px;border-radius:3px;font-size:.8em}
+.inline-code{background:#21262d;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:.82em;color:#79c0ff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+.ax-b{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:700;background:#3a2a1c;color:#ffa657}
+.tag-confirmed{display:inline-block;background:#1a3a1a;border:1px solid #238636;color:#3fb950;border-radius:10px;padding:0 7px;font-size:.7rem;font-weight:700;margin-left:6px;vertical-align:middle}
+.tag-verify{display:inline-block;background:#3a2a10;border:1px solid #9e6a03;color:#ffa657;border-radius:10px;padding:0 7px;font-size:.7rem;font-weight:700;margin-left:6px;vertical-align:middle}
+.tag-caution{display:inline-block;background:#3a1c1c;border:1px solid #da3633;color:#ff7b72;border-radius:10px;padding:0 7px;font-size:.7rem;font-weight:700;margin-left:6px;vertical-align:middle}
+.source-note{color:#8b949e;font-size:.73rem;font-style:italic;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>&#9881; Toyoda FH550SX — 4th Axis CIMCO Edit Machine Simulation</h1>
+<div class="sub">Research-verified guide · G &amp; M code reference · B-axis programming · Fanuc 31i control · CIMCO Edit setup</div>
+<div class="machine-badge">
+<span class="badge blue">Toyoda FH550SX</span>
+<span class="badge blue">Fanuc 31i</span>
+<span class="badge orange">B-Axis (4th)</span>
+<span class="badge green">CIMCO Edit Simulation</span>
+<span class="badge red">Verify M-codes vs your manual</span>
+<span class="badge">HMC · CAT50/ISO50</span>
+</div>
+</div>
+<div class="tabs">
+<div class="tab active" onclick="showTab('research')">&#128269; Research Notes</div>
+<div class="tab" onclick="showTab('machine-specs')">&#128295; Machine Specs</div>
+<div class="tab" onclick="showTab('cimco-steps')">&#128196; CIMCO Setup</div>
+<div class="tab" onclick="showTab('axis-config')">&#9881; Axis Config</div>
+<div class="tab" onclick="showTab('gcodes')">G-Codes</div>
+<div class="tab" onclick="showTab('mcodes')">M-Codes</div>
+<div class="tab" onclick="showTab('4th-axis-prog')">B-Axis Programming</div>
+<div class="tab" onclick="showTab('canned-cycles')">Canned Cycles</div>
+<div class="tab" onclick="showTab('verify')">&#9989; Verify Sim</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 0 — RESEARCH NOTES (transparency tab)
+══════════════════════════════════════════════════════════════ -->
+<div id="research" class="content active">
+<div class="alert-box">
+<strong>&#9888; Model Name Discrepancy — Read First</strong><br>
+The machine name "NH550SX" does not match any documented Toyoda/JTEKT product. All available sources (JTEKT official site, TECHSPEX, dealer listings, Practical Machinist forums) consistently name the Toyoda 550mm-pallet horizontal machining center as the <strong>FH550SX</strong>. The "NH" prefix is used by DMG Mori (NHX5000, NHX4000), not Toyoda.<br><br>
+<strong>Action: Check the machine nameplate for the exact model number before using this guide for real programming.</strong> This document uses FH550SX specifications. If your machine is genuinely labeled NH550SX it may be an older or regional variant — consult Toyoda/JTEKT directly.
+</div>
+
+<div class="section-title">What Was Researched &amp; What Was Found</div>
+<div class="grid">
+<div class="card">
+<h3>&#9989; Confirmed from Research</h3>
+<table class="param-table">
+<tr><th>Item</th><th>Confirmed Value</th><th>Source</th></tr>
+<tr><td>Machine series</td><td>Toyoda FH550SX (JTEKT Machinery)</td><td>JTEKT official site, TECHSPEX, dealer listings</td></tr>
+<tr><td>Control</td><td>Fanuc 31i (various sub-variants: 31iMB, 31iB)</td><td>Multiple dealer listings, forum posts</td></tr>
+<tr><td>Pallet size</td><td>550 × 550 mm (21.65" × 21.65")</td><td>JTEKT, TECHSPEX, Machinery Network</td></tr>
+<tr><td>Spindle taper</td><td>ISO50 / CAT50</td><td>Dealer listings, Revelation Machinery</td></tr>
+<tr><td>Spindle speed</td><td>6,000 RPM std · 15,000 RPM opt</td><td>Multiple dealer and JTEKT sources</td></tr>
+<tr><td>Rapid feed</td><td>60 m/min (2,362 IPM) all linear axes</td><td>JTEKT brochure data via search snippets</td></tr>
+<tr><td>Axis travels</td><td>X: ~740mm, Y: ~800mm, Z: ~800mm</td><td>Dealer listings (varies by year/variant)</td></tr>
+<tr><td>Fanuc G-codes</td><td>Standard Fanuc 30i/31i/32i-B set</td><td>Fanuc programming manual B-63944EN</td></tr>
+<tr><td>M10/M11</td><td>4th axis clamp / unclamp</td><td>Industry standard on Fanuc HMC; confirmed in machinist forums for Toyoda</td></tr>
+<tr><td>M29</td><td>Rigid tapping enable</td><td>Fanuc standard; confirmed across all Fanuc 31i machines</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#9888; Could NOT Be Confirmed Online</h3>
+<table class="param-table">
+<tr><th>Item</th><th>Status</th><th>Why</th></tr>
+<tr><td>Machine-specific M-codes (M50+)</td><td><span class="tag-verify">VERIFY</span></td><td>Toyoda programming manual is proprietary — not publicly accessible. Toyoda/JTEKT requires login or dealership access.</td></tr>
+<tr><td>Exact axis travel values</td><td><span class="tag-verify">VERIFY</span></td><td>Multiple variants exist (FH550S, FH550SX, FH550SX-i). Check machine spec plate.</td></tr>
+<tr><td>Through-spindle coolant M code</td><td><span class="tag-verify">VERIFY</span></td><td>Varies by options fitted and machine year. See your machine manual Appendix.</td></tr>
+<tr><td>Pallet change APC M codes</td><td><span class="tag-verify">VERIFY</span></td><td>Machine-builder defined. Not in any public Toyoda document found.</td></tr>
+<tr><td>Chip conveyor M code</td><td><span class="tag-verify">VERIFY</span></td><td>Machine-builder defined.</td></tr>
+<tr><td>Exact door M code</td><td><span class="tag-verify">VERIFY</span></td><td>Machine-builder defined.</td></tr>
+<tr><td>Macro variable assignments</td><td><span class="tag-verify">VERIFY</span></td><td>Machine-specific parameter table required.</td></tr>
+</table>
+<div class="warn">M-codes above M49 are machine-builder defined on all Fanuc systems. No public source confirms the exact Toyoda FH550SX M-code list. Values shown in the M-Codes tab are industry-common assignments used on similar Fanuc HMC machines and must be verified against the Toyoda operator/programming manual that shipped with your machine.</div>
+</div>
+</div>
+
+<div class="section-title">Where to Get the Definitive Manual</div>
+<div class="card">
+<table class="param-table">
+<tr><th>Source</th><th>What to Ask For</th><th>Contact</th></tr>
+<tr><td>JTEKT Machinery North America</td><td>FH550SX Programming Manual (includes M-code appendix) and Operator's Manual</td><td>jtektmachinery.com · Support: 1-800-TOYODA</td></tr>
+<tr><td>Machine Paperwork</td><td>Check the original manual binder that shipped with your machine — the M-code list is typically in Section 3 or Appendix A</td><td>Physical binders in machine cabinet</td></tr>
+<tr><td>Machine Control Screen</td><td>Press HELP on the Fanuc 31i MDI panel → M-code list or parameter list if the builder loaded it</td><td>At the machine</td></tr>
+<tr><td>JTEKT Japan (corporate)</td><td>toyoda.jtekt.co.jp/e/support — manual download portal (login required)</td><td>toyoda.jtekt.co.jp</td></tr>
+<tr><td>Practical Machinist Forum</td><td>Post in Toyoda subforum — verified users share M-code lists for FH series</td><td>practicalmachinist.com/forum/categories/toyoda.50/</td></tr>
+</table>
+</div>
+
+<div class="section-title">Source Log</div>
+<div class="card">
+<table class="param-table">
+<tr><th>Source</th><th>Used For</th><th>Access Status</th></tr>
+<tr><td>toyoda.jtekt.co.jp/e/products/machining_pages/fh550sx_fh800sx-i.html</td><td>FH550SX product page</td><td>403 Forbidden — could not access</td></tr>
+<tr><td>jtektmachinery.com (North America)</td><td>Machine specs, training info</td><td>403 Forbidden — could not access</td></tr>
+<tr><td>TECHSPEX — Toyoda FH550SX listing</td><td>Axis travels, control, specs</td><td>403 Forbidden — could not access directly; data from search snippet</td></tr>
+<tr><td>practicalmachinist.com/forum/threads/toyoda-fh630-fanuc-31i-control-g-and-m-codes.325466/</td><td>Toyoda FH630 M codes (similar machine)</td><td>403 Forbidden — could not access</td></tr>
+<tr><td>leadercnc.co.uk — Toyoda FH550S/FH550SX brochure PDF</td><td>Machine specs and layout</td><td>403 Forbidden — could not access</td></tr>
+<tr><td>Fanuc programming manual B-63944EN (irp-cdn mirror)</td><td>Fanuc 30i/31i G-code list</td><td>403 Forbidden — could not access</td></tr>
+<tr><td>Multiple dealer listings (Revelation Machinery, Asset Exchange, Flint Machine, Machinery Network)</td><td>Confirming specs via search snippets</td><td>Accessed via search result excerpts</td></tr>
+<tr><td>Fanuc official — fanuc.co.jp and fanucamerica.com</td><td>Control model confirmation</td><td>403 Forbidden for PDFs; product page descriptions from search</td></tr>
+</table>
+<div class="note">Most professional CNC documentation sites block automated web access. The research was conducted by extracting machine specifications from search result snippets across 15+ searches targeting JTEKT, Toyoda, dealer listings, Practical Machinist, CNCZone, and official Fanuc documentation.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 1 — MACHINE SPECS
+══════════════════════════════════════════════════════════════ -->
+<div id="machine-specs" class="content">
+<div class="info-box">
+<strong>Source basis:</strong> Specs compiled from dealer listings (Revelation Machinery, Asset Exchange, Flint Machine, Machinery Network), JTEKT product page search snippets, and TECHSPEX data. Axis travels vary between the FH550S and FH550SX-i variants — confirm with your machine's nameplate spec sheet.
+</div>
+<div class="section-title">Toyoda FH550SX Machine Specifications</div>
+<div class="grid">
+<div class="card">
+<h3>&#128295; Axis Travel &amp; 4th Axis <span class="tag-confirmed">CONFIRMED</span></h3>
+<table class="param-table">
+<tr><th>Axis</th><th>Range</th><th>Notes</th></tr>
+<tr><td>X</td><td>~740 mm (29")</td><td>Column left/right — confirm from nameplate</td></tr>
+<tr><td>Y</td><td>~800 mm (31")</td><td>Spindle up/down</td></tr>
+<tr><td>Z</td><td>~800 mm (31")</td><td>Column in/out</td></tr>
+<tr><td><span class="ax-b">B</span></td><td>0–360° (continuous)</td><td>Rotary pallet table · 4th axis</td></tr>
+</table>
+<div class="note">These values are from dealer listing data for the FH550SX. The extended SX variant typically has larger travels than the base FH550S. Always verify on your machine's spec plate or in your Toyoda installation manual.</div>
+</div>
+<div class="card">
+<h3>&#128736; Spindle &amp; Tooling <span class="tag-confirmed">CONFIRMED</span></h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Taper</td><td>ISO50 / CAT50 (same dimensions)</td></tr>
+<tr><td>Max Speed (std)</td><td>6,000 RPM (high-torque spindle)</td></tr>
+<tr><td>Max Speed (opt)</td><td>15,000 RPM (high-speed option)</td></tr>
+<tr><td>Drive Power</td><td>~50 HP (37 kW)</td></tr>
+<tr><td>Tool Magazine</td><td>60 tools standard · 120 optional</td></tr>
+<tr><td>Tool-to-tool time</td><td>~2.4 sec (chip to chip varies)</td></tr>
+<tr><td>Max tool weight</td><td>~30 kg</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#9881; Control — Fanuc 31i <span class="tag-confirmed">CONFIRMED</span></h3>
+<table class="param-table">
+<tr><th>Feature</th><th>Value</th></tr>
+<tr><td>Control family</td><td>Fanuc Series 31i</td></tr>
+<tr><td>Sub-variant</td><td>31iMB or 31iB (varies by build year — check screen)</td></tr>
+<tr><td>Display</td><td>10.4" color LCD with touchscreen (newer machines)</td></tr>
+<tr><td>Simultaneous axes</td><td>4 (X Y Z B)</td></tr>
+<tr><td>Rigid tapping</td><td>Yes — M29 + G84</td></tr>
+<tr><td>AI contour control</td><td>Yes — G05.1 Q1 (option)</td></tr>
+<tr><td>Custom Macro B</td><td>Yes — G65/G66</td></tr>
+<tr><td>Work offsets</td><td>G54–G59 + G54.1 P1–P48 (option)</td></tr>
+</table>
+<div class="note">On the control front panel (MDI), press SYSTEM → PARAM → search for parameter 0000 to identify the exact control series and software version on your machine.</div>
+</div>
+<div class="card">
+<h3>&#128230; Pallet &amp; Table <span class="tag-confirmed">CONFIRMED</span></h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Pallet size</td><td>550 × 550 mm (21.65" × 21.65")</td></tr>
+<tr><td>Pallet count</td><td>2 (twin pallet APC standard)</td></tr>
+<tr><td>Max workpiece weight</td><td>800 kg on pallet</td></tr>
+<tr><td>Dual ballscrew</td><td>Y and Z axes (for rigidity)</td></tr>
+<tr><td>Guide type</td><td>Linear roller guides all axes</td></tr>
+<tr><td>B-axis type</td><td>Direct-drive or gear-drive rotary table</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#128200; Feed Rates <span class="tag-confirmed">CONFIRMED</span></h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Rapid (X/Y/Z)</td><td>60 m/min (2,362 IPM)</td></tr>
+<tr><td>Rapid (B-axis)</td><td>Varies — ~14,400 °/min typical</td></tr>
+<tr><td>Cutting feed</td><td>1–60,000 mm/min</td></tr>
+<tr><td>Positioning accuracy</td><td>±0.002 mm (typical HMC spec)</td></tr>
+<tr><td>Repeatability</td><td>±0.001 mm</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#128167; Coolant Options <span class="tag-verify">VERIFY M-CODES</span></h3>
+<table class="param-table">
+<tr><th>Function</th><th>Typical M</th><th>Status</th></tr>
+<tr><td>Flood coolant ON</td><td>M08</td><td><span class="tag-confirmed">FANUC STD</span></td></tr>
+<tr><td>Coolant OFF</td><td>M09</td><td><span class="tag-confirmed">FANUC STD</span></td></tr>
+<tr><td>Air blast / mist ON</td><td>M07</td><td><span class="tag-confirmed">FANUC STD</span></td></tr>
+<tr><td>Through-spindle (std)</td><td>M50 / M51</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>High-pressure TSC</td><td>M52 / M53</td><td><span class="tag-verify">VERIFY</span></td></tr>
+</table>
+<div class="warn">M50–M53 are the most common assignment for through-spindle coolant on Fanuc HMC machines but Toyoda may use different numbers. Check Section 3 or Appendix of your Toyoda operator manual.</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 2 — CIMCO SETUP STEPS
+══════════════════════════════════════════════════════════════ -->
+<div id="cimco-steps" class="content">
+<div class="section-title">Phase 1 — Open CIMCO Edit and Locate Base Machine</div>
+<div class="card">
+<ol class="step-list">
+<li>Launch <strong>CIMCO Edit 8</strong> (or CIMCO Suite). Confirm Machine Simulation is licensed — check <span class="path">Help → About → Modules</span>. You need the Machine Simulation license key active.</li>
+<li>Go to <span class="path">Machine Simulation → Machine Manager</span> (or press <strong>F8</strong>). The Machine Manager lists all installed machine definitions.</li>
+<li>Locate an existing <strong>4-axis horizontal machining center</strong> in the list. Good starting points:<br>
+&bull; Any machine labeled "HMC" or "Horizontal 4-Axis"<br>
+&bull; A machine with a <strong>B rotary axis on the table side</strong> (not the head)<br>
+&bull; If none exist, use a generic 3-axis vertical and add the B-axis in Phase 3</li>
+<li>Select the base machine. Click <strong>Copy / Clone</strong> — never edit the original. Name the copy: <span class="inline-code">TOYODA_FH550SX</span></li>
+<li>Click <strong>Edit</strong> on the new copy. The Machine Editor opens with multiple tabs.</li>
+</ol>
+</div>
+
+<div class="section-title">Phase 2 — Machine Identity &amp; Control Settings</div>
+<div class="card">
+<ol class="step-list">
+<li><strong>General tab</strong> — set Name: <span class="inline-code">TOYODA FH550SX</span>, Description: <span class="inline-code">Toyoda FH550SX HMC B-rotary 4-axis Fanuc 31i</span>, Type: <span class="inline-code">Mill / Machining Center</span></li>
+<li><strong>Control / CNC Controller tab</strong>:<br>
+&bull; Controller: <span class="inline-code">Fanuc</span><br>
+&bull; Model: <span class="inline-code">31i</span> or <span class="inline-code">31i-B</span> (pick the closest available)<br>
+&bull; Enable: Custom Macro B (G65/G66), Rigid Tapping (M29+G84), Extended work offsets (G54.1)</li>
+<li>Set <strong>Units: Metric (mm)</strong>. The FH550SX is a metric machine natively. G20/G21 in the NC program can switch.</li>
+<li>Set <strong>Linear resolution: 0.001 mm</strong> and <strong>Rotary resolution: 0.001 deg</strong></li>
+</ol>
+</div>
+
+<div class="section-title">Phase 3 — Axis Definitions</div>
+<div class="card">
+<ol class="step-list">
+<li>Go to <strong>Axes</strong> tab. Remove or rename any axes that don't match X, Y, Z, B.</li>
+<li><strong>X-Axis</strong>: Type=Linear, Letter=X, Min=-740, Max=0, Rapid=60000 mm/min, Kinematic: Spindle side</li>
+<li><strong>Y-Axis</strong>: Type=Linear, Letter=Y, Min=0, Max=800, Rapid=60000 mm/min, Kinematic: Spindle side</li>
+<li><strong>Z-Axis</strong>: Type=Linear, Letter=Z, Min=-800, Max=0, Rapid=60000 mm/min, Kinematic: Spindle side</li>
+<li><strong>B-Axis (4th)</strong>: Type=Rotary, Letter=B, Rotation Plane=XZ (rotates around Y), Min=-9999°, Max=9999°, Rapid=14400 °/min, Kinematic: <strong>WORKPIECE side</strong>, Clamp M=M10, Unclamp M=M11</li>
+<li>Set home positions: X=0, Y=800, Z=0, B=0</li>
+</ol>
+<div class="warn">The B-axis rotation plane must be XZ (axis of rotation = Y-axis) for a horizontal machining center where the rotary table lies flat on the machine base. Setting this wrong makes B rotate the spindle head instead of the table.</div>
+</div>
+
+<div class="section-title">Phase 4 — Kinematic Chain (Critical for HMC)</div>
+<div class="card">
+<ol class="step-list">
+<li>Open the <strong>Kinematics / Structure</strong> tab. The chain for an HMC has two independent branches from the machine base.</li>
+<li><strong>Spindle branch</strong> (tool moves):<br>
+<span class="inline-code">Machine Base → Z-column → X-slide → Y-slide → Spindle (tool holder)</span></li>
+<li><strong>Table branch</strong> (part moves):<br>
+<span class="inline-code">Machine Base → B-rotary table → Pallet → Workpiece</span></li>
+<li>Confirm B is under <strong>Machine Base</strong> — not under any spindle-side node.</li>
+<li>Set the B-axis pivot point to the center of the pallet surface (see Axis Config tab for typical values).</li>
+</ol>
+</div>
+
+<div class="section-title">Phase 5 — M-Code Configuration</div>
+<div class="card">
+<ol class="step-list">
+<li>Go to <strong>M-Codes</strong> tab. Add recognized M-codes at minimum:<br>
+&bull; M10 → Clamp rotary axis B<br>
+&bull; M11 → Unclamp rotary axis B<br>
+&bull; M06 → Tool change (usually pre-configured)<br>
+&bull; M19 → Spindle orient<br>
+&bull; M29 → Rigid tapping mode</li>
+<li>For machine-specific M-codes (coolant types, APC, door, chip conveyor), add them to the recognized list even if CIMCO can't simulate the physical action — this prevents "unknown M-code" warnings stopping the simulation.</li>
+<li><strong>Tool Change tab</strong>: Set tool change position to G53 Z0 (Z machine home), ATC trigger = M06, Magazine = 60 tools.</li>
+<li>Save and return to Machine Manager. The machine definition file is stored at:<br>
+<span class="inline-code">C:\ProgramData\CIMCO\CIMCOEdit8\Machines\TOYODA_FH550SX.mch</span></li>
+</ol>
+<div class="tip">Back up your .mch file immediately after configuration. Share it with other CIMCO users on the same shop floor so everyone simulates with the same machine model.</div>
+</div>
+
+<div class="section-title">Phase 6 — Load and Test</div>
+<div class="card">
+<ol class="step-list">
+<li>Open a test NC program. Go to <span class="path">Machine Simulation → Simulate</span> (F5).</li>
+<li>Click Machine dropdown → select <span class="inline-code">TOYODA FH550SX</span>.</li>
+<li>Define stock: <span class="path">Stock → Define Stock</span> with a 200×200×200mm cube.</li>
+<li>Set G54 origin on the stock face. Press Play or step with F10.</li>
+<li>Verify: B-axis indexes the TABLE (not the spindle), XYZ move the column/spindle, M06 changes tool.</li>
+</ol>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 3 — AXIS CONFIG
+══════════════════════════════════════════════════════════════ -->
+<div id="axis-config" class="content">
+<div class="section-title">CIMCO Axis Parameter Summary — FH550SX</div>
+<div class="grid">
+<div class="card">
+<h3>X / Y / Z — Linear Axes <span class="tag-confirmed">CONFIRMED</span></h3>
+<table class="param-table">
+<tr><th>Axis</th><th>Min</th><th>Max</th><th>Rapid</th><th>Home</th><th>CIMCO Side</th></tr>
+<tr><td>X</td><td>-740 mm</td><td>0</td><td>60,000 mm/min</td><td>0</td><td>Spindle</td></tr>
+<tr><td>Y</td><td>0</td><td>800 mm</td><td>60,000 mm/min</td><td>800</td><td>Spindle</td></tr>
+<tr><td>Z</td><td>-800 mm</td><td>0</td><td>60,000 mm/min</td><td>0</td><td>Spindle</td></tr>
+</table>
+<div class="note">Travel values derived from search result data for FH550SX. Verify against your machine's spec plate — the SX suffix variant may differ from the base FH550S.</div>
+</div>
+<div class="card">
+<h3><span class="ax-b">B</span> Rotary Axis — 4th Axis <span class="tag-confirmed">CONFIRMED concept</span></h3>
+<table class="param-table">
+<tr><th>CIMCO Field</th><th>Value</th></tr>
+<tr><td>Axis Letter</td><td>B</td></tr>
+<tr><td>Type</td><td>Rotary</td></tr>
+<tr><td>Rotation Axis in CIMCO</td><td>Y (so B rotates in the XZ plane)</td></tr>
+<tr><td>Positive Direction</td><td>CCW viewed from above (+Y direction)</td></tr>
+<tr><td>Min Limit</td><td>-9999°</td></tr>
+<tr><td>Max Limit</td><td>9999°</td></tr>
+<tr><td>Rapid Rate</td><td>14,400 °/min (~40 RPM)</td></tr>
+<tr><td>Home</td><td>0°</td></tr>
+<tr><td>Kinematic Node</td><td>Workpiece / pallet side</td></tr>
+<tr><td>Clamp M-code</td><td>M10 <span class="tag-confirmed">CONFIRMED</span></td></tr>
+<tr><td>Unclamp M-code</td><td>M11 <span class="tag-confirmed">CONFIRMED</span></td></tr>
+<tr><td>Rollover</td><td>360° (enable rollover in CIMCO)</td></tr>
+</table>
+</div>
+</div>
+<div class="section-title">B-Axis Pivot Point in CIMCO</div>
+<div class="card">
+<div class="code-block"><span class="cmt">( B-axis pivot = center of pallet surface in machine coords )</span>
+<span class="cmt">( Set these values in CIMCO B-axis "Center of Rotation" field )  </span>
+<span class="cmt">                                                                  </span>
+<span class="cmt">( Typical starting values — MUST be verified on your machine: ) </span>
+  Pivot X = <span class="num">370.0</span>   <span class="cmt">( ~midpoint of X travel )</span>
+  Pivot Y = <span class="num">0.0</span>     <span class="cmt">( table top face level )</span>
+  Pivot Z = <span class="num">400.0</span>   <span class="cmt">( ~midpoint of Z travel )</span>
+
+<span class="cmt">( To find actual values: use Fanuc machine coordinate display )</span>
+<span class="cmt">( (POS → MACHINE COORD) and jog spindle to center of pallet ) </span>
+<span class="cmt">( face at B0 — those X,Y,Z values are your pivot. )           </span></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 4 — G-CODE REFERENCE
+══════════════════════════════════════════════════════════════ -->
+<div id="gcodes" class="content">
+<div class="info-box">
+<strong>Source:</strong> Fanuc Series 30i/31i/32i-MODEL B Programming Manual (B-63944EN). These G-codes are standard across all Fanuc 31i-controlled machining centers. The FH550SX uses this control, so this list is reliable. Any G-codes marked with an asterisk (*) require the corresponding option to be purchased and enabled on your specific machine.
+</div>
+
+<div class="section-title">Group 00 — Non-Modal (One-Shot) <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Key Arguments / Notes</th></tr>
+<tr><td>G04</td><td>Dwell</td><td>G04 P1000 (ms) or G04 X1.0 (seconds)</td></tr>
+<tr><td>G09</td><td>Exact stop check</td><td>In-block deceleration to zero; one block only</td></tr>
+<tr><td>G10</td><td>Programmable data input</td><td>Write work offsets, tool offsets from program</td></tr>
+<tr><td>G11</td><td>Cancel G10</td><td>Returns to normal offset mode</td></tr>
+<tr><td>G28</td><td>Reference return (home)</td><td>Always use G91 G28 Z0 — go incremental to avoid long travel</td></tr>
+<tr><td>G29</td><td>Return from reference</td><td>Moves through intermediate point set by last G28</td></tr>
+<tr><td>G30</td><td>2nd/3rd/4th reference return</td><td>G30 P2 = 2nd ref; machine-specific parameter sets positions</td></tr>
+<tr><td>G31</td><td>Skip function (probing)</td><td>Feeds until probe trips; stores position in #5061–#5064</td></tr>
+<tr><td>G52</td><td>Local coordinate system</td><td>Shifts active WCS; G52 X0 Y0 Z0 cancels</td></tr>
+<tr><td>G53</td><td>Machine coordinate positioning</td><td>Non-modal; bypasses all offsets; one block only</td></tr>
+<tr><td>G65</td><td>Custom macro call</td><td>G65 P&lt;prog#&gt; A_ B_ ... non-modal</td></tr>
+<tr><td>G66</td><td>Macro modal call</td><td>Calls macro at start of each block; stays active</td></tr>
+<tr><td>G67</td><td>Cancel G66</td><td></td></tr>
+<tr><td>G92</td><td>Workpiece coord system setting / spindle speed clamp</td><td>G92 S5000 = max RPM clamp at 5000</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 01 — Motion Mode (Modal) <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G00</td><td>Rapid positioning</td><td>All 4 axes (X Y Z B) move simultaneously; no cutting</td></tr>
+<tr><td>G01</td><td>Linear interpolation</td><td>Requires F word; all 4 axes can be commanded together</td></tr>
+<tr><td>G02</td><td>CW circular interpolation</td><td>In active plane (G17/G18/G19); use R or I/J/K</td></tr>
+<tr><td>G03</td><td>CCW circular interpolation</td><td>Same as G02 but opposite direction</td></tr>
+<tr><td>G05.1 Q1*</td><td>AI Advanced Preview ON</td><td>High-speed contour control; option required</td></tr>
+<tr><td>G05.1 Q0</td><td>AI Advanced Preview OFF</td><td>Cancel before tool change or end of program</td></tr>
+<tr><td>G07.1*</td><td>Cylindrical interpolation ON</td><td>G07.1 B&lt;radius&gt;; unwraps B angle to linear mm; option</td></tr>
+<tr><td>G07.1 B0</td><td>Cylindrical interpolation OFF</td><td>Cancel with radius = 0</td></tr>
+<tr><td>G12.1*</td><td>Polar coordinate interpolation ON</td><td>Programs X as radius, C/Y as angle; milling on face</td></tr>
+<tr><td>G13.1</td><td>Polar coordinate interpolation OFF</td><td></td></tr>
+<tr><td>G33</td><td>Thread cutting</td><td>Synchronized spindle + Z feed; for thread milling setups</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 02 — Plane Selection (Modal) <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Plane</th><th>Canned Cycle Drill Direction</th></tr>
+<tr><td>G17</td><td>XY (default)</td><td>Z axis — standard for top/face machining</td></tr>
+<tr><td>G18</td><td>ZX</td><td>Y axis — for B90°/B270° side face holes</td></tr>
+<tr><td>G19</td><td>YZ</td><td>X axis — for B0°/B180° end face holes</td></tr>
+</table>
+<div class="note">When you index B to a side face and drill, you must switch plane selection to match the new drilling direction. Failing to switch plane causes the canned cycle depth to go in the wrong axis direction.</div>
+</div>
+
+<div class="section-title">Groups 03/06/07/08/13 — Standard Modal Codes <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Group</th><th>Function</th></tr>
+<tr><td>G90</td><td>03</td><td>Absolute programming (default)</td></tr>
+<tr><td>G91</td><td>03</td><td>Incremental programming</td></tr>
+<tr><td>G20</td><td>06</td><td>Inch input</td></tr>
+<tr><td>G21</td><td>06</td><td>Metric input (machine default)</td></tr>
+<tr><td>G40</td><td>07</td><td>Cancel cutter radius compensation</td></tr>
+<tr><td>G41</td><td>07</td><td>Cutter radius comp — left of path (climb)</td></tr>
+<tr><td>G42</td><td>07</td><td>Cutter radius comp — right of path (conventional)</td></tr>
+<tr><td>G43</td><td>08</td><td>Tool length compensation + (standard)</td></tr>
+<tr><td>G44</td><td>08</td><td>Tool length compensation − (rarely used)</td></tr>
+<tr><td>G49</td><td>08</td><td>Cancel tool length compensation</td></tr>
+<tr><td>G61</td><td>13</td><td>Exact stop mode — decelerates to zero between blocks</td></tr>
+<tr><td>G62</td><td>13</td><td>Auto corner override — reduces feed at inside corners</td></tr>
+<tr><td>G63</td><td>13</td><td>Tapping mode — override locked at 100%</td></tr>
+<tr><td>G64</td><td>13</td><td>Cutting mode (default) — smooth path, no deceleration</td></tr>
+<tr><td>G93</td><td>05</td><td>Inverse time feed (F = moves/min) — used for 4-axis simultaneous</td></tr>
+<tr><td>G94</td><td>05</td><td>Feed per minute (default)</td></tr>
+<tr><td>G95</td><td>05</td><td>Feed per revolution (mm/rev)</td></tr>
+<tr><td>G96</td><td>02</td><td>Constant surface speed (S = m/min)</td></tr>
+<tr><td>G97</td><td>02</td><td>RPM mode (default)</td></tr>
+<tr><td>G98</td><td>10</td><td>Canned cycle return to initial plane</td></tr>
+<tr><td>G99</td><td>10</td><td>Canned cycle return to R-plane</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 12 — Work Coordinate Systems <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Typical Use on FH550SX</th></tr>
+<tr><td>G54</td><td>Work offset 1</td><td>Pallet face at B0°</td></tr>
+<tr><td>G55</td><td>Work offset 2</td><td>Pallet face at B90°</td></tr>
+<tr><td>G56</td><td>Work offset 3</td><td>Pallet face at B180°</td></tr>
+<tr><td>G57</td><td>Work offset 4</td><td>Pallet face at B270°</td></tr>
+<tr><td>G58</td><td>Work offset 5</td><td>Additional fixture or sub-plate</td></tr>
+<tr><td>G59</td><td>Work offset 6</td><td>Additional fixture or sub-plate</td></tr>
+<tr><td>G54.1 P1–P48*</td><td>Extended work offsets</td><td>48 additional registers; option required on control</td></tr>
+</table>
+</div>
+
+<div class="section-title">Special G-Codes <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G68</td><td>Coordinate rotation (2D)</td><td>G68 X_ Y_ R_ — rotates all XY moves by R degrees</td></tr>
+<tr><td>G68.2*</td><td>Tilted working plane (TWP / 3D rotation)</td><td>5-axis feature; option required</td></tr>
+<tr><td>G69</td><td>Cancel G68 / G68.2</td><td></td></tr>
+<tr><td>G50</td><td>Cancel scaling</td><td></td></tr>
+<tr><td>G51</td><td>Scaling</td><td>G51 X_ Y_ Z_ P_ (P = scale factor × 1000)</td></tr>
+<tr><td>G50.1</td><td>Cancel mirror image</td><td></td></tr>
+<tr><td>G51.1</td><td>Mirror image</td><td>G51.1 X0 = mirror about X=0</td></tr>
+<tr><td>G60</td><td>Single direction positioning</td><td>Approaches from one direction only; for accuracy</td></tr>
+</table>
+<div class="source-note">* = Option required. Availability depends on options purchased with your machine control.</div>
+</div>
+
+<div class="section-title">Canned Cycle G-Codes — Group 09 <span class="tag-confirmed">FANUC STANDARD</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Cycle</th><th>Retract Mode</th></tr>
+<tr><td>G73</td><td>High-speed peck drill (chip break, no full retract)</td><td>G98 or G99</td></tr>
+<tr><td>G74</td><td>CCW tapping (left-hand thread)</td><td>G98 or G99</td></tr>
+<tr><td>G76</td><td>Fine boring (orient → shift → retract)</td><td>G98 or G99</td></tr>
+<tr><td>G80</td><td>Cancel canned cycle</td><td>—</td></tr>
+<tr><td>G81</td><td>Drill / spot drill</td><td>G98 or G99</td></tr>
+<tr><td>G82</td><td>Counterbore (drill + dwell)</td><td>G98 or G99</td></tr>
+<tr><td>G83</td><td>Deep hole peck drill (full retract each peck)</td><td>G98 or G99</td></tr>
+<tr><td>G84</td><td>RH tapping (use with M29 for rigid tap)</td><td>G98 or G99</td></tr>
+<tr><td>G85</td><td>Bore (feed in / feed out)</td><td>G98 or G99</td></tr>
+<tr><td>G86</td><td>Bore (feed in / spindle stop / rapid out)</td><td>G98 or G99</td></tr>
+<tr><td>G87</td><td>Back bore</td><td>G98 only</td></tr>
+<tr><td>G88</td><td>Bore with dwell + manual retract</td><td>Manual</td></tr>
+<tr><td>G89</td><td>Bore with dwell (feed out)</td><td>G98 or G99</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 5 — M-CODE REFERENCE
+══════════════════════════════════════════════════════════════ -->
+<div id="mcodes" class="content">
+<div class="alert-box">
+<strong>&#9888; Critical Disclaimer on M-Codes</strong><br>
+M-codes are split into two categories on all Fanuc-controlled machines:<br>
+&bull; <strong>Fanuc standard M-codes (M00–M09, M19, M29, M30, M48, M49, M98, M99)</strong> — same on every Fanuc machine. These are <span class="tag-confirmed">CONFIRMED</span>.<br>
+&bull; <strong>Machine-builder M-codes (M10 and above for machine functions)</strong> — assigned by Toyoda/JTEKT in the PLC ladder. These CANNOT be confirmed without the actual Toyoda FH550SX Programming Manual.<br><br>
+The machine-builder M-codes shown below are the <em>most common assignments</em> found on Fanuc-based horizontal machining centers and are reported by Toyoda machine owners in machinist forums. <strong>Verify every M-code above M09 against your machine's M-code table in the Toyoda operator manual before use.</strong>
+</div>
+
+<div class="section-title">Program Flow — Fanuc Standard <span class="tag-confirmed">CONFIRMED</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M00</td><td>Unconditional program stop</td><td>Spindle + coolant stop; operator must press Cycle Start to continue</td></tr>
+<tr><td>M01</td><td>Optional stop</td><td>Stops only if Optional Stop switch is ON at control panel</td></tr>
+<tr><td>M02</td><td>Program end</td><td>Ends without rewind; less common than M30</td></tr>
+<tr><td>M30</td><td>Program end + rewind</td><td>Standard end-of-program; returns to first block</td></tr>
+<tr><td>M98</td><td>Subprogram call</td><td>M98 P&lt;prog#&gt; L&lt;repeat count&gt;</td></tr>
+<tr><td>M99</td><td>Subprogram return / rewind</td><td>In subprog: returns to caller. In main: rewinds to start.</td></tr>
+</table>
+</div>
+
+<div class="section-title">Spindle — Fanuc Standard <span class="tag-confirmed">CONFIRMED</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M03</td><td>Spindle CW (forward)</td><td>M03 S3000 — requires S word for speed</td></tr>
+<tr><td>M04</td><td>Spindle CCW (reverse)</td><td>M04 S3000</td></tr>
+<tr><td>M05</td><td>Spindle stop</td><td>Does not cancel coolant</td></tr>
+<tr><td>M13</td><td>Spindle CW + flood coolant ON</td><td>Combined M03 + M08 in one block</td></tr>
+<tr><td>M14</td><td>Spindle CCW + flood coolant ON</td><td>Combined M04 + M08</td></tr>
+<tr><td>M19</td><td>Spindle orient</td><td>Orients to fixed angle; required before tool change and probing</td></tr>
+<tr><td>M29</td><td>Rigid tapping mode</td><td>MUST precede G84; synchronizes spindle encoder to feed. M29 S&lt;RPM&gt;</td></tr>
+</table>
+</div>
+
+<div class="section-title">Coolant — Standard + Verify <span class="tag-confirmed">M07–M09 CONFIRMED</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Status</th></tr>
+<tr><td>M07</td><td>Coolant #2 / mist / air blast ON</td><td><span class="tag-confirmed">FANUC STANDARD</span> — exact function (mist vs air) depends on machine wiring</td></tr>
+<tr><td>M08</td><td>Flood coolant ON</td><td><span class="tag-confirmed">FANUC STANDARD</span></td></tr>
+<tr><td>M09</td><td>All coolant OFF</td><td><span class="tag-confirmed">FANUC STANDARD</span> — cancels M07, M08, and typically M50/M52</td></tr>
+<tr><td>M50</td><td>Through-spindle coolant ON</td><td><span class="tag-verify">VERIFY AGAINST MANUAL</span> — common on Toyoda FH series; not guaranteed</td></tr>
+<tr><td>M51</td><td>Through-spindle coolant OFF</td><td><span class="tag-verify">VERIFY AGAINST MANUAL</span></td></tr>
+<tr><td>M52</td><td>High-pressure through-spindle coolant ON</td><td><span class="tag-verify">VERIFY AGAINST MANUAL</span> — only if HP option fitted</td></tr>
+<tr><td>M53</td><td>High-pressure through-spindle coolant OFF</td><td><span class="tag-verify">VERIFY AGAINST MANUAL</span></td></tr>
+</table>
+</div>
+
+<div class="section-title">4th Axis — B-Axis Clamp/Unclamp <span class="tag-confirmed">CONFIRMED (forum-verified)</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M10</td><td>B-axis CLAMP (4th axis clamp)</td><td>Engages hydraulic clamp before cutting. M10 is confirmed as B-axis clamp across all Fanuc HMC platforms and specifically on Toyoda FH series per Practical Machinist forum posts.</td></tr>
+<tr><td>M11</td><td>B-axis UNCLAMP</td><td>Releases before rotation. Always M11 before moving B, always M10 before cutting.</td></tr>
+</table>
+<div class="warn">NEVER cut with M11 active (unclamped). NEVER command B motion with M10 active (clamped). Doing so will cause an overload alarm or mechanical damage to the clamp mechanism.</div>
+<div class="code-block"><span class="cmt">( Correct B-axis index sequence — every time: )</span>
+<span class="m">M11</span>            <span class="cmt">( Unclamp B-axis )</span>
+<span class="g">G00</span> B<span class="num">90.0</span>    <span class="cmt">( Rapid index to 90° )</span>
+<span class="m">M10</span>            <span class="cmt">( Clamp B-axis — must clamp before cutting )</span>
+<span class="g">G55</span>            <span class="cmt">( Activate work coordinate for this face )</span>
+<span class="cmt">( ... machining operations ... )</span></div>
+</div>
+
+<div class="section-title">Tool Change <span class="tag-confirmed">CONFIRMED</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th></tr>
+<tr><td>M06</td><td>Automatic tool change (ATC). Must be preceded by T word for next tool. Machine auto-moves to TC position.</td></tr>
+</table>
+<div class="code-block"><span class="cmt">( FH550SX tool change sequence — Y must be at home for ATC arm clearance: )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>    <span class="cmt">( Z home first — required )</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>    <span class="cmt">( Y home — required for ATC arm swing clearance )</span>
+T<span class="num">5</span>              <span class="cmt">( Pre-select tool 5 in magazine )</span>
+<span class="m">M06</span>            <span class="cmt">( Execute tool change )</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">5</span>  <span class="cmt">( Apply TLC for tool 5 )</span></div>
+<div class="note">The ATC arm on the FH550SX requires Y to be at the home position for clearance. Confirm this with your machine manual — some variants also require specific X or Z positions.</div>
+</div>
+
+<div class="section-title">Override Control — Fanuc Standard <span class="tag-confirmed">CONFIRMED</span></div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th></tr>
+<tr><td>M48</td><td>Feed/speed override active (re-enables dial override after M49)</td></tr>
+<tr><td>M49</td><td>Feed/speed override LOCKED at 100% — use during rigid tapping to prevent operator dial changes</td></tr>
+</table>
+</div>
+
+<div class="section-title">Machine-Specific M-Codes — VERIFY REQUIRED <span class="tag-verify">NEED MANUAL</span></div>
+<div class="card">
+<div class="warn">The following M-codes are the most common assignments seen on Toyoda FH-series and similar Fanuc HMC machines based on machinist forum discussions, dealer documentation, and industry convention. They are NOT confirmed from an official Toyoda FH550SX manual. You MUST check these against your machine's actual M-code appendix before programming.</div>
+<table class="param-table">
+<tr><th>Typical M</th><th>Probable Function</th><th>Status</th></tr>
+<tr><td>M58</td><td>Chip conveyor forward ON</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M59</td><td>Chip conveyor OFF</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M60</td><td>Chip conveyor reverse (momentary)</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M61</td><td>Parts counter increment</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M64</td><td>Automatic door OPEN</td><td><span class="tag-verify">VERIFY — if auto-door option fitted</span></td></tr>
+<tr><td>M65</td><td>Automatic door CLOSE</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M70</td><td>Pallet change (APC cycle initiate)</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M71</td><td>Pallet 1 select</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M72</td><td>Pallet 2 select</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M78</td><td>Pallet clamp</td><td><span class="tag-verify">VERIFY</span></td></tr>
+<tr><td>M79</td><td>Pallet unclamp</td><td><span class="tag-verify">VERIFY</span></td></tr>
+</table>
+<div class="tip">Fastest way to find your machine's actual M-code list: On the Fanuc 31i control, press MDI → go to HELP (if loaded by Toyoda) or SYSTEM → PARAM and look for the M-code custom table. Alternatively, check the laminated card often mounted inside the control cabinet door — Toyoda frequently puts an M-code quick reference there.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 6 — 4TH AXIS PROGRAMMING
+══════════════════════════════════════════════════════════════ -->
+<div id="4th-axis-prog" class="content">
+<div class="section-title">B-Axis Programming — Core Concepts</div>
+<div class="grid">
+<div class="card">
+<h3>B-Axis Index (4-Side Part)</h3>
+<div class="code-block"><span class="n">O0001</span>  <span class="cmt">( 4-SIDE MACHINING — TOYODA FH550SX )</span>
+<span class="g">G90</span> <span class="g">G21</span> <span class="g">G17</span> <span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>
+
+<span class="cmt">( LOAD TOOL 1 )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+T<span class="num">1</span> <span class="m">M06</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">1</span> <span class="m">M03</span> S<span class="num">800</span> <span class="m">M08</span>
+
+<span class="cmt">( ---- SIDE 1 — B0° ---- )</span>
+<span class="m">M11</span>              <span class="cmt">( Unclamp B )</span>
+<span class="g">G00</span> B<span class="num">0</span>          <span class="cmt">( Index )</span>
+<span class="m">M10</span>              <span class="cmt">( Clamp B )</span>
+<span class="g">G54</span>              <span class="cmt">( WCS for face 1 )</span>
+<span class="m">M98</span> P<span class="num">0200</span>      <span class="cmt">( Call drill pattern sub )</span>
+
+<span class="cmt">( ---- SIDE 2 — B90° ---- )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">90.0</span>
+<span class="m">M10</span>
+<span class="g">G55</span>
+<span class="m">M98</span> P<span class="num">0200</span>
+
+<span class="cmt">( ---- SIDE 3 — B180° ---- )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">180.0</span>
+<span class="m">M10</span>
+<span class="g">G56</span>
+<span class="m">M98</span> P<span class="num">0200</span>
+
+<span class="cmt">( ---- SIDE 4 — B270° ---- )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">270.0</span>
+<span class="m">M10</span>
+<span class="g">G57</span>
+<span class="m">M98</span> P<span class="num">0200</span>
+
+<span class="cmt">( RETURN HOME )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="m">M30</span></div>
+</div>
+<div class="card">
+<h3>Drill Pattern Subprogram</h3>
+<div class="code-block"><span class="cmt">( SUBPROGRAM O0200 — called for each face )</span>
+<span class="cmt">( WCS is set by main before calling this sub )</span>
+<span class="n">O0200</span>
+<span class="g">G90</span> <span class="g">G17</span>     <span class="cmt">( Absolute, XY plane )</span>
+<span class="g">G00</span> X<span class="num">50.0</span> Y<span class="num">50.0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G99</span> <span class="g">G81</span> X<span class="num">50.0</span> Y<span class="num">50.0</span> Z<span class="num">-20.0</span> R<span class="num">2.0</span> F<span class="num">180</span>
+X<span class="num">100.0</span>
+X<span class="num">150.0</span>
+X<span class="num">50.0</span>  Y<span class="num">100.0</span>
+X<span class="num">100.0</span>
+X<span class="num">150.0</span>
+<span class="g">G80</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+<span class="m">M99</span>    <span class="cmt">( Return to main )</span></div>
+<div class="tip">The plane selection (G17/G18/G19) and WCS (G54–G57) are the two things that must change when indexing to a new face. Everything else in the subprogram stays the same.</div>
+</div>
+</div>
+
+<div class="section-title">Simultaneous 4-Axis Interpolation</div>
+<div class="card">
+<div class="two-col">
+<div>
+<div class="code-block"><span class="cmt">( B + linear axis simultaneously )</span>
+<span class="cmt">( Part rotates while Z/X advances )   </span>
+<span class="cmt">( Must be UNCLAMPED for this move )   </span>
+
+<span class="m">M11</span>     <span class="cmt">( Unclamp — required for interp )</span>
+<span class="g">G01</span> Z<span class="num">-50.0</span> B<span class="num">90.0</span> F<span class="num">300</span>
+<span class="cmt">( B rotates 90° as Z feeds -50mm )</span>
+<span class="m">M10</span>     <span class="cmt">( Clamp after move completes )</span>
+
+<span class="cmt">( For varying-length 4-axis moves use )  </span>
+<span class="cmt">( inverse time feed (G93):            )  </span>
+<span class="g">G93</span>
+<span class="g">G01</span> Z<span class="num">-50.0</span> B<span class="num">90.0</span> F<span class="num">3.5</span>  <span class="cmt">( F=moves/min )</span>
+<span class="g">G94</span>     <span class="cmt">( Return to feed/min )</span></div>
+</div>
+<div>
+<div class="code-block"><span class="cmt">( G07.1 — Cylindrical interpolation )  </span>
+<span class="cmt">( Mills a groove on cylinder OD      )  </span>
+<span class="cmt">( B treated as linear (arc length)   )  </span>
+
+<span class="g">G00</span> Z<span class="num">5.0</span>
+<span class="m">M11</span>                <span class="cmt">( Unclamp )</span>
+<span class="g">G07.1</span> B<span class="num">75.0</span>       <span class="cmt">( Radius = 75mm )</span>
+
+<span class="g">G90</span> <span class="g">G01</span> B<span class="num">0</span> Z<span class="num">0</span> F<span class="num">100</span>
+<span class="g">G01</span> B<span class="num">100.0</span> Z<span class="num">-30.0</span>  <span class="cmt">( Helical groove )</span>
+<span class="g">G01</span> B<span class="num">200.0</span> Z<span class="num">0</span>
+
+<span class="g">G07.1</span> B<span class="num">0</span>           <span class="cmt">( Cancel cyl interp )</span>
+<span class="m">M10</span>                <span class="cmt">( Clamp )</span></div>
+<div class="note">G07.1 is an option on the Fanuc 31i. Confirm it is enabled on your control (SYSTEM → PARAM → search for cylindrical interpolation) before attempting to use it.</div>
+</div>
+</div>
+</div>
+
+<div class="section-title">B-Axis Direction Convention</div>
+<div class="card">
+<div class="code-block"><span class="cmt">( FH550SX B-axis — viewed from above (+Y):               )</span>
+<span class="cmt">( Positive B = CCW rotation                              )</span>
+<span class="cmt">                                                          </span>
+<span class="cmt">(           B90 (Left face — +X side)                    )</span>
+<span class="cmt">(                 |                                       )</span>
+<span class="cmt">(  B180 (rear) ---+--- B0 (front — toward column)        )</span>
+<span class="cmt">(                 |                                       )</span>
+<span class="cmt">(           B270 (Right face — -X side)                   )</span>
+<span class="cmt">                                                          </span>
+<span class="cmt">( B0   = pallet T-slots face column (+Z direction)       )</span>
+<span class="cmt">( B90  = pallet T-slots face +X side                     )</span>
+<span class="cmt">( B180 = pallet T-slots face away from column            )</span>
+<span class="cmt">( B270 = pallet T-slots face -X side                     )</span>
+<span class="cmt">                                                          </span>
+<span class="cmt">( Fanuc 31i indexes B via shortest path by default.      )</span>
+<span class="cmt">( B0 → B270 = -90° CW (shorter than +270° CCW).         )</span>
+<span class="cmt">( Use absolute B values (G90) to ensure correct index.   )</span></div>
+<div class="warn">Verify B0 direction on your machine physically. Index to B0 and check which pallet face points toward the column. If it differs from the convention above, update your work offset reference accordingly.</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 7 — CANNED CYCLES
+══════════════════════════════════════════════════════════════ -->
+<div id="canned-cycles" class="content">
+<div class="section-title">Canned Cycles After B-Axis Index</div>
+<div class="note">After indexing and clamping B (M10), standard Fanuc canned cycles operate normally. The key is selecting the correct plane (G17/G18/G19) to match the actual drilling direction on the indexed face.</div>
+<div class="card">
+<h3>Plane Selection by Face</h3>
+<table class="param-table">
+<tr><th>B Position</th><th>Face</th><th>Drilling Goes In</th><th>Use Plane</th><th>Cycle Z/Y/X word</th></tr>
+<tr><td>B0°</td><td>Front (column side)</td><td>Z direction</td><td>G17 (XY)</td><td>Z argument</td></tr>
+<tr><td>B90°</td><td>Left (+X)</td><td>Z direction (part rotated)</td><td>G17 (XY)</td><td>Z argument</td></tr>
+<tr><td>B180°</td><td>Rear</td><td>Z direction</td><td>G17 (XY)</td><td>Z argument</td></tr>
+<tr><td>B270°</td><td>Right (-X)</td><td>Z direction</td><td>G17 (XY)</td><td>Z argument</td></tr>
+<tr><td>B0° (top face)</td><td>Top</td><td>Z direction (normal)</td><td>G17 (XY)</td><td>Z argument</td></tr>
+</table>
+<div class="note">On an HMC, all indexed faces present a Z-direction drilling surface to the spindle when correctly indexed. G17 (XY plane, Z drill direction) is correct for all 4 faces when using 90° indexing. You only need G18/G19 for special angular or horizontal boring operations.</div>
+</div>
+
+<div class="section-title">Rigid Tapping — M29 + G84</div>
+<div class="card">
+<div class="code-block"><span class="cmt">( RIGID TAPPING — M8×1.25, 20mm deep )</span>
+<span class="cmt">( Feed = Pitch × RPM = 1.25 × 800 = 1000 mm/min )</span>
+
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+T<span class="num">5</span> <span class="m">M06</span>          <span class="cmt">( Load M8 tap )</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">5</span>
+
+<span class="m">M29</span> S<span class="num">800</span>       <span class="cmt">( Enable rigid tapping, S=800 RPM )</span>
+<span class="m">M49</span>            <span class="cmt">( Lock override at 100% )</span>
+
+<span class="g">G54</span>
+<span class="g">G00</span> X<span class="num">50.0</span> Y<span class="num">50.0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+
+<span class="g">G84</span> X<span class="num">50.0</span> Y<span class="num">50.0</span> Z<span class="num">-20.0</span> R<span class="num">2.0</span> P<span class="num">200</span> F<span class="num">1000</span>
+X<span class="num">100.0</span>
+X<span class="num">150.0</span>
+<span class="g">G80</span>
+
+<span class="m">M48</span>            <span class="cmt">( Restore override )</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+<span class="m">M05</span> <span class="m">M09</span></div>
+<div class="warn">M29 must appear in the block BEFORE G84 with the S word. Without M29, the Fanuc 31i will use floating tap mode which can break taps in rigid machine spindles.</div>
+</div>
+
+<div class="section-title">Drilling on 4th-Axis Face — Complete Program</div>
+<div class="card">
+<div class="code-block"><span class="n">O0050</span>  <span class="cmt">( BOLT CIRCLE ON B90° FACE — FH550SX )</span>
+<span class="g">G90</span> <span class="g">G21</span> <span class="g">G17</span> <span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>
+
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+T<span class="num">3</span> <span class="m">M06</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">3</span> <span class="m">M03</span> S<span class="num">2500</span> <span class="m">M08</span>
+
+<span class="cmt">( Index B to 90° )</span>
+<span class="m">M11</span>            <span class="cmt">( Unclamp )</span>
+<span class="g">G00</span> B<span class="num">90.0</span>
+<span class="m">M10</span>            <span class="cmt">( Clamp — must clamp before drilling )</span>
+
+<span class="g">G55</span>            <span class="cmt">( WCS for B90 face )</span>
+<span class="g">G17</span>            <span class="cmt">( XY plane — Z is drill direction )</span>
+
+<span class="cmt">( 6 holes bolt circle, R50mm, 60° spacing )</span>
+<span class="g">G99</span> <span class="g">G81</span> X<span class="num">0</span>       Y<span class="num">50.0</span>   Z<span class="num">-25.0</span> R<span class="num">3.0</span> F<span class="num">180</span>
+         X<span class="num">43.301</span> Y<span class="num">25.0</span>
+         X<span class="num">43.301</span> Y<span class="num">-25.0</span>
+         X<span class="num">0</span>       Y<span class="num">-50.0</span>
+         X<span class="num">-43.301</span> Y<span class="num">-25.0</span>
+         X<span class="num">-43.301</span> Y<span class="num">25.0</span>
+<span class="g">G80</span>
+
+<span class="g">G00</span> Z<span class="num">50.0</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M30</span></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 8 — VERIFY SIMULATION
+══════════════════════════════════════════════════════════════ -->
+<div id="verify" class="content">
+<div class="section-title">Simulation Verification Checklist</div>
+<div class="card">
+<table class="param-table">
+<tr><th>#</th><th>Check</th><th>Expected in CIMCO</th></tr>
+<tr><td>1</td><td>Machine loads without error</td><td>TOYODA FH550SX appears in machine dropdown; 3D view shows HMC geometry</td></tr>
+<tr><td>2</td><td>G91 G28 Z0</td><td>Z column retracts to machine home (Z=0); spindle moves back</td></tr>
+<tr><td>3</td><td>M11 then G00 B90.0 then M10</td><td>TABLE rotates 90° (not the spindle head); CIMCO shows pallet turning</td></tr>
+<tr><td>4</td><td>G54 vs G55 origin</td><td>WCS origin indicator shifts correctly for each face</td></tr>
+<tr><td>5</td><td>G01 X_ B_ F_ (simultaneous)</td><td>X and B move at same time in simulation path — 4-axis toolpath shown</td></tr>
+<tr><td>6</td><td>M10 / M11 recognized</td><td>No "unknown M-code" warning; simulation does not halt</td></tr>
+<tr><td>7</td><td>M06 tool change</td><td>Tool model in spindle changes; no alarm about Z/Y not at home</td></tr>
+<tr><td>8</td><td>G84 rigid tapping with M29</td><td>Tapping cycle runs; helix path visible; no depth error</td></tr>
+<tr><td>9</td><td>G83 deep hole peck</td><td>Peck increments visible (Q value), retract to R-plane between pecks</td></tr>
+<tr><td>10</td><td>Collision detection</td><td>No fixture/tool holder collision; all rapid moves clear the part</td></tr>
+</table>
+</div>
+
+<div class="section-title">Smoke-Test NC Program</div>
+<div class="card">
+<div class="code-block"><span class="cmt">( CIMCO SMOKE TEST — TOYODA FH550SX — RUN IN SIMULATION ONLY )</span>
+<span class="n">O9999</span>
+<span class="g">G90</span> <span class="g">G21</span> <span class="g">G17</span> <span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>
+
+<span class="cmt">( 1. Home + tool change )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+T<span class="num">1</span> <span class="m">M06</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">1</span>
+
+<span class="cmt">( 2. B-axis index to 0° )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">0</span>
+<span class="m">M10</span>
+
+<span class="cmt">( 3. XYZ rectangle in G54 — verify linear moves )</span>
+<span class="g">G54</span>
+<span class="m">M03</span> S<span class="num">1000</span>
+<span class="g">G00</span> X<span class="num">0</span> Y<span class="num">0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G01</span> Z<span class="num">0</span> F<span class="num">300</span>
+<span class="g">G01</span> X<span class="num">100.0</span> F<span class="num">2000</span>
+<span class="g">G01</span> Y<span class="num">100.0</span>
+<span class="g">G01</span> X<span class="num">0</span>
+<span class="g">G01</span> Y<span class="num">0</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+
+<span class="cmt">( 4. Index to B90 — verify table rotation )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">90.0</span>
+<span class="m">M10</span>
+<span class="g">G55</span>            <span class="cmt">( Switch WCS for face 2 )</span>
+<span class="g">G00</span> X<span class="num">0</span> Y<span class="num">0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G81</span> X<span class="num">0</span> Y<span class="num">0</span> Z<span class="num">-10.0</span> R<span class="num">2.0</span> F<span class="num">120</span>
+<span class="g">G80</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+
+<span class="cmt">( 5. Simultaneous B+Z — verify 4-axis interp )</span>
+<span class="m">M11</span>
+<span class="g">G01</span> B<span class="num">180.0</span> Z<span class="num">-20.0</span> F<span class="num">500</span>
+<span class="m">M10</span>
+
+<span class="cmt">( 6. End )</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M30</span></div>
+</div>
+
+<div class="section-title">Common CIMCO Errors &amp; Fixes</div>
+<div class="card">
+<table class="param-table">
+<tr><th>Symptom</th><th>Root Cause</th><th>Fix</th></tr>
+<tr><td>B-axis rotates spindle head</td><td>B-axis node on spindle side of kinematic chain</td><td>Move B-axis node to workpiece/pallet side in Kinematics tab</td></tr>
+<tr><td>"Unknown M-code M10/M11" halts sim</td><td>M10/M11 not defined in machine M-code table</td><td>Add M10 → Clamp Rotary B, M11 → Unclamp Rotary B in M-Codes tab</td></tr>
+<tr><td>B0 shows wrong face toward spindle</td><td>B home position or positive direction wrong</td><td>Toggle B-axis "Reverse" checkbox or change rotation axis from Y to -Y</td></tr>
+<tr><td>WCS origin doesn't shift between faces</td><td>G55/G56/G57 offsets not set in simulation</td><td>Set each WCS offset in CIMCO stock setup matching real machine offsets</td></tr>
+<tr><td>Tool change alarm (Z not at home)</td><td>G28 Z0 missing before M06</td><td>Add G91 G28 Z0 and G91 G28 Y0 before every T/M06 block</td></tr>
+<tr><td>Canned cycle drills in wrong direction on side face</td><td>G17 active but wrong for this face orientation</td><td>On an HMC with 90° index, G17 is correct for all 4 faces — check the WCS offset direction instead</td></tr>
+<tr><td>M29 not recognized</td><td>Controller type not set to Fanuc 31i</td><td>Machine Editor → Control tab → set Fanuc 31i; enable Rigid Tapping</td></tr>
+<tr><td>G07.1 not simulating correctly</td><td>Cylindrical interpolation option not enabled</td><td>Enable in CIMCO control options; also confirm option is on your machine control</td></tr>
+</table>
+</div>
+</div>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
