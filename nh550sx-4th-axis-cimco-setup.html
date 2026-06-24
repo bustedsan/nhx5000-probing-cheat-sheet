@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toyoda NH550SX — 4th Axis CIMCO Edit Machine Simulation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a2744,#0d1b2a);padding:20px 30px;border-bottom:2px solid #30363d}
+.header h1{color:#58a6ff;font-size:1.6rem;font-weight:700}
+.header .sub{color:#8b949e;font-size:.85rem;margin-top:4px}
+.machine-badge{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.badge{background:#21262d;border:1px solid #30363d;border-radius:12px;padding:3px 10px;font-size:.75rem;color:#8b949e}
+.badge.green{border-color:#238636;color:#3fb950}
+.badge.blue{border-color:#1f6feb;color:#58a6ff}
+.badge.orange{border-color:#9e6a03;color:#ffa657}
+.tabs{display:flex;background:#161b22;border-bottom:1px solid #30363d;overflow-x:auto;padding:0 10px;flex-wrap:nowrap}
+.tab{padding:11px 16px;cursor:pointer;border-bottom:2px solid transparent;color:#8b949e;font-size:.82rem;white-space:nowrap;transition:all .2s}
+.tab:hover{color:#c9d1d9}
+.tab.active{color:#58a6ff;border-bottom-color:#58a6ff}
+.content{display:none;padding:24px 30px;max-width:1400px;margin:0 auto}
+.content.active{display:block}
+.section-title{color:#58a6ff;font-size:1.05rem;font-weight:600;margin:22px 0 12px;border-left:3px solid #58a6ff;padding-left:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px}
+.card h3{color:#e6edf3;font-size:.93rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.code-block{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:12px;font-family:'Consolas','Courier New',monospace;font-size:.8rem;line-height:1.75;overflow-x:auto;white-space:pre}
+.g{color:#79c0ff}.m{color:#ff7b72}.n{color:#ffa657}.cmt{color:#8b949e}.var{color:#d2a8ff}.num{color:#a5d6ff}.lit{color:#e6edf3}.key{color:#7ee787}
+.param-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.8rem}
+.param-table th{background:#21262d;color:#8b949e;padding:6px 10px;text-align:left;border:1px solid #30363d}
+.param-table td{padding:6px 10px;border:1px solid #30363d;vertical-align:top;line-height:1.5}
+.param-table td:first-child{color:#ffa657;font-family:monospace;white-space:nowrap;font-weight:600}
+.param-table td:nth-child(2){color:#79c0ff}
+.param-table tr:hover td{background:#1c2128}
+.note{background:#1c2128;border-left:3px solid #d29922;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:#e3b341;margin:8px 0}
+.warn{background:#1c2128;border-left:3px solid #da3633;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:#ff7b72;margin:8px 0}
+.tip{background:#1c2128;border-left:3px solid #238636;padding:10px 14px;border-radius:0 6px 6px 0;font-size:.8rem;color:#3fb950;margin:8px 0}
+.step-list{counter-reset:step;list-style:none;margin:10px 0}
+.step-list li{counter-increment:step;display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;font-size:.83rem;line-height:1.6}
+.step-list li::before{content:counter(step);background:#1f6feb;color:#fff;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-list li span.path{color:#79c0ff;font-family:monospace;background:#21262d;padding:1px 5px;border-radius:3px;font-size:.8em}
+.inline-code{background:#21262d;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:.82em;color:#79c0ff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+.axis-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:700;margin-right:4px}
+.ax-x{background:#1c3a5f;color:#79c0ff}.ax-y{background:#1c3a2a;color:#3fb950}.ax-z{background:#3a1c1c;color:#ff7b72}.ax-b{background:#3a2a1c;color:#ffa657}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>&#9881; Toyoda NH550SX — 4th Axis CIMCO Edit Machine Simulation</h1>
+<div class="sub">Step-by-step setup guide · G &amp; M code reference · B-axis programming · Fanuc 31i-B5 control</div>
+<div class="machine-badge">
+<span class="badge blue">Toyoda NH550SX</span>
+<span class="badge blue">Fanuc 31i-B5</span>
+<span class="badge orange">B-Axis (4th)</span>
+<span class="badge green">CIMCO Edit Simulation</span>
+<span class="badge">HMC · BT50</span>
+<span class="badge">Twin Pallet</span>
+</div>
+</div>
+<div class="tabs">
+<div class="tab active" onclick="showTab('machine-specs')">&#128295; Machine Specs</div>
+<div class="tab" onclick="showTab('cimco-steps')">&#128196; CIMCO Setup Steps</div>
+<div class="tab" onclick="showTab('axis-config')">&#9881; Axis Config</div>
+<div class="tab" onclick="showTab('gcodes')">G-Codes</div>
+<div class="tab" onclick="showTab('mcodes')">M-Codes</div>
+<div class="tab" onclick="showTab('4th-axis-prog')">B-Axis Programming</div>
+<div class="tab" onclick="showTab('canned-cycles')">Canned Cycles</div>
+<div class="tab" onclick="showTab('verify')">&#9989; Verify Sim</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 1 — MACHINE SPECS
+══════════════════════════════════════════════════════════════ -->
+<div id="machine-specs" class="content active">
+<div class="section-title">Toyoda NH550SX Machine Specifications</div>
+<div class="grid">
+<div class="card">
+<h3>&#128295; Axis Travel &amp; 4th Axis</h3>
+<table class="param-table">
+<tr><th>Axis</th><th>Range</th><th>Notes</th></tr>
+<tr><td>X</td><td>550 mm (21.65")</td><td>Column left/right</td></tr>
+<tr><td>Y</td><td>600 mm (23.62")</td><td>Spindle up/down</td></tr>
+<tr><td>Z</td><td>600 mm (23.62")</td><td>Column in/out</td></tr>
+<tr><td><span class="ax-b">B</span></td><td>0–360° (±9999°)</td><td>Rotary pallet table · 0.001° res</td></tr>
+</table>
+<div class="note">B-axis is the 4th axis on this HMC — the pallet rotates, not the spindle head. CIMCO must reflect this kinematic difference.</div>
+</div>
+<div class="card">
+<h3>&#128736; Spindle &amp; Tooling</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Taper</td><td>BT50 (ISO 7388-1)</td></tr>
+<tr><td>Max Speed</td><td>12,000 RPM (std) / 20,000 RPM (opt)</td></tr>
+<tr><td>Drive Power</td><td>22 / 26 kW (cont/30min)</td></tr>
+<tr><td>Tool Magazine</td><td>60 tools (arm-type ATC)</td></tr>
+<tr><td>Max Tool Dia</td><td>250 mm (adjacent empty)</td></tr>
+<tr><td>Max Tool Length</td><td>500 mm</td></tr>
+<tr><td>Max Tool Weight</td><td>30 kg</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#9881; Control — Fanuc 31i-B5</h3>
+<table class="param-table">
+<tr><th>Feature</th><th>Value</th></tr>
+<tr><td>Control</td><td>Fanuc Series 31i-B5</td></tr>
+<tr><td>Display</td><td>10.4" color LCD</td></tr>
+<tr><td>Program memory</td><td>2 MB (expandable)</td></tr>
+<tr><td>Max programs</td><td>400 (standard)</td></tr>
+<tr><td>Simultaneous axes</td><td>4 (X Y Z B)</td></tr>
+<tr><td>Rigid tapping</td><td>Yes — G84 / M29</td></tr>
+<tr><td>AI contour control</td><td>Yes — G05.1 Q1</td></tr>
+<tr><td>Macro</td><td>Custom Macro B (G65/G66)</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#128230; Pallet &amp; Table</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Pallet size</td><td>500 × 500 mm</td></tr>
+<tr><td>Pallet count</td><td>2 (twin pallet — APC)</td></tr>
+<tr><td>Max workpiece wt</td><td>800 kg</td></tr>
+<tr><td>Table center height</td><td>1,050 mm (from floor)</td></tr>
+<tr><td>T-slot width</td><td>18 mm</td></tr>
+<tr><td>T-slot pitch</td><td>100 mm</td></tr>
+<tr><td>B-axis clamp torque</td><td>4,000 N·m</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#128200; Feed Rates &amp; Accuracy</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Rapid (X/Y/Z)</td><td>60 m/min</td></tr>
+<tr><td>Rapid (B-axis)</td><td>40 RPM (14,400°/min)</td></tr>
+<tr><td>Cutting feed</td><td>1–60,000 mm/min</td></tr>
+<tr><td>Positioning acc</td><td>±0.002 mm (ISO 230-2)</td></tr>
+<tr><td>Repeatability</td><td>±0.001 mm</td></tr>
+<tr><td>B-axis indexing acc</td><td>±3 arc-sec</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#128167; Coolant Systems</h3>
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th></tr>
+<tr><td>M08</td><td>Flood coolant ON</td></tr>
+<tr><td>M09</td><td>All coolant OFF</td></tr>
+<tr><td>M50</td><td>Through-spindle coolant ON (std)</td></tr>
+<tr><td>M51</td><td>Through-spindle coolant OFF</td></tr>
+<tr><td>M52</td><td>High-pressure through-spindle ON</td></tr>
+<tr><td>M53</td><td>High-pressure through-spindle OFF</td></tr>
+<tr><td>M07</td><td>Mist coolant ON (air blast)</td></tr>
+</table>
+</div>
+</div>
+<div class="section-title">Machine Coordinate Zero (Machine Home)</div>
+<div class="grid">
+<div class="card">
+<h3>&#127968; Reference / Home Position</h3>
+<div class="code-block"><span class="cmt">( MACHINE HOME — G28 returns all axes to this position )</span>
+<span class="cmt">( Fanuc 31i-B5 machine coordinates at home: )</span>
+  X <span class="num">0.000</span>   <span class="cmt">( Far right — column retracted right )</span>
+  Y <span class="num">0.000</span>   <span class="cmt">( Top — spindle at highest position )</span>
+  Z <span class="num">0.000</span>   <span class="cmt">( Rear — column retracted from table )</span>
+  B <span class="num">0.000</span>   <span class="cmt">( B-axis zero = pallet T-slot forward )</span>
+
+<span class="cmt">( G53 positions use machine coordinates directly )</span>
+<span class="g">G53</span> X<span class="num">0</span> Y<span class="num">0</span> Z<span class="num">0</span>   <span class="cmt">( Rapid to machine home )</span></div>
+</div>
+<div class="card">
+<h3>&#128204; B-Axis Zero Convention</h3>
+<div class="code-block"><span class="cmt">( B0 = T-slots facing Z+ direction (facing column) )</span>
+<span class="cmt">( B90 = T-slots rotated 90° CCW viewed from above )</span>
+<span class="cmt">( B180 = T-slots facing Z- (away from column) )</span>
+<span class="cmt">( B270 = T-slots rotated 270° CCW viewed from above )</span>
+
+<span class="cmt">( Positive rotation direction: CCW viewed from above )</span>
+<span class="cmt">( Use M10/M11 to clamp/unclamp BEFORE/AFTER index )</span>
+
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>    <span class="cmt">( B-axis return to zero reference )</span>
+<span class="m">M10</span>            <span class="cmt">( Clamp B-axis )</span></div>
+<div class="note">Always verify B0 direction on your specific machine — Toyoda sometimes ships with B0 facing the APC door side depending on configuration.</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 2 — CIMCO SETUP STEPS
+══════════════════════════════════════════════════════════════ -->
+<div id="cimco-steps" class="content">
+<div class="section-title">Phase 1 — Open CIMCO Edit and Locate Base Machine</div>
+<div class="card">
+<ol class="step-list">
+<li>Launch <strong>CIMCO Edit 8</strong> (or CIMCO Suite). Ensure Machine Simulation module is licensed/activated — check <span class="path">Help → About → Modules</span>.</li>
+<li>Go to <span class="path">Machine Simulation → Machine Manager</span> (or press <strong>F8</strong>). The Machine Manager dialog lists all installed machine definitions.</li>
+<li>In the machine list, locate an existing <strong>4-axis horizontal machining center</strong>. Common built-in candidates:<br>
+  &bull; <em>Generic 4-Axis HMC</em><br>
+  &bull; <em>Fanuc 4-Axis Mill</em><br>
+  &bull; Any machine with a <strong>B rotary axis</strong> on the table side (not the head).<br>
+  If none exists, look for a 3-axis vertical mill and you will add the B-axis manually in Phase 3.</li>
+<li>Select the base machine. Click <strong>Copy / Clone</strong> (not Edit). Name the copy: <span class="inline-code">TOYODA_NH550SX</span>.</li>
+<li>Click <strong>Edit</strong> on the new <span class="inline-code">TOYODA_NH550SX</span> entry. The Machine Editor opens.</li>
+</ol>
+</div>
+
+<div class="section-title">Phase 2 — Machine Identity &amp; Control Settings</div>
+<div class="card">
+<ol class="step-list">
+<li>In the <strong>General</strong> tab of Machine Editor, set:<br>
+  &bull; <strong>Name:</strong> <span class="inline-code">TOYODA NH550SX</span><br>
+  &bull; <strong>Description:</strong> <span class="inline-code">Toyoda NH550SX HMC 4-axis B-rotary Fanuc 31i-B5</span><br>
+  &bull; <strong>Machine Type:</strong> <span class="inline-code">Mill</span> (or Milling Center)</li>
+<li>In the <strong>Control / Post</strong> tab (may be labeled <em>CNC Control</em> or <em>Controller</em>):<br>
+  &bull; Set <strong>Controller:</strong> <span class="inline-code">Fanuc</span><br>
+  &bull; Set <strong>Control Model:</strong> <span class="inline-code">31i</span> or <span class="inline-code">31i-B</span> if available in the dropdown<br>
+  &bull; Enable <strong>Custom Macro B</strong> support (G65/G66 recognition)<br>
+  &bull; Enable <strong>Rigid Tapping</strong> (M29 + G84)</li>
+<li>Set <strong>Units</strong> to <span class="inline-code">Metric (mm)</span> — the NH550SX native unit is metric. Your NC programs can use G20/G21 to switch.</li>
+<li>Set <strong>Linear resolution</strong>: <span class="inline-code">0.001 mm</span> and <strong>Rotary resolution</strong>: <span class="inline-code">0.001 deg</span>.</li>
+</ol>
+</div>
+
+<div class="section-title">Phase 3 — Axis Definitions</div>
+<div class="card">
+<ol class="step-list">
+<li>Navigate to the <strong>Axes</strong> tab. You should see a list of defined axes. Delete or rename any axes that do not match X, Y, Z, B.</li>
+<li>Define or verify <strong>X-Axis</strong> (linear):<br>
+  &bull; Type: <span class="inline-code">Linear</span> · Direction: <span class="inline-code">+X</span><br>
+  &bull; Min: <span class="inline-code">-550</span> · Max: <span class="inline-code">0</span> (or 0 to 550, depending on your machine home convention)<br>
+  &bull; Rapid: <span class="inline-code">60000 mm/min</span> · Max feed: <span class="inline-code">60000 mm/min</span></li>
+<li>Define or verify <strong>Y-Axis</strong> (linear):<br>
+  &bull; Type: <span class="inline-code">Linear</span> · Direction: <span class="inline-code">+Y</span><br>
+  &bull; Min: <span class="inline-code">0</span> · Max: <span class="inline-code">600</span><br>
+  &bull; Rapid: <span class="inline-code">60000 mm/min</span></li>
+<li>Define or verify <strong>Z-Axis</strong> (linear):<br>
+  &bull; Type: <span class="inline-code">Linear</span> · Direction: <span class="inline-code">+Z</span><br>
+  &bull; Min: <span class="inline-code">-600</span> · Max: <span class="inline-code">0</span><br>
+  &bull; Rapid: <span class="inline-code">60000 mm/min</span></li>
+<li>Add or configure <strong>B-Axis</strong> (4th axis — rotary):<br>
+  &bull; Type: <span class="inline-code">Rotary</span><br>
+  &bull; Rotation plane: <span class="inline-code">XZ</span> (rotates around Y — this is correct for an HMC B-axis table)<br>
+  &bull; Min: <span class="inline-code">-9999</span> · Max: <span class="inline-code">9999</span> (unlimited rotation)<br>
+  &bull; Rapid: <span class="inline-code">14400 deg/min</span> (= 40 RPM)<br>
+  &bull; <strong>Axis letter:</strong> <span class="inline-code">B</span></li>
+<li>Set <strong>axis home positions</strong> (these are the G28 return values in simulation):<br>
+  X=0, Y=600, Z=0, B=0 — adjust to match what your machine displays at reference.</li>
+</ol>
+<div class="warn">The B-axis on an HMC rotates the TABLE, not the head. In CIMCO's kinematic chain the B-axis node must be placed on the WORKPIECE side, not the spindle side. Incorrect placement will produce wrong 4-axis simulation paths.</div>
+</div>
+
+<div class="section-title">Phase 4 — Kinematic Chain (Critical for HMC)</div>
+<div class="card">
+<ol class="step-list">
+<li>Open the <strong>Kinematics</strong> tab (sometimes called <em>Machine Structure</em> or <em>Component Tree</em>).</li>
+<li>The correct kinematic chain for the NH550SX is:<br>
+  <span class="inline-code">Machine Base → [Z-column] → [X-slide] → [Y-slide] → Spindle (tool)</span><br>
+  <span class="inline-code">Machine Base → [B-rotary table] → Workpiece (pallet)</span></li>
+<li>Ensure the <strong>B-axis node is a child of Machine Base</strong>, not a child of any spindle-side node.</li>
+<li>Set the <strong>B-axis pivot point</strong> (center of rotation in machine coordinates). This should be the center of the pallet table. Typical value: X=275, Y=0, Z=center-of-table-face (measure from your machine).</li>
+<li>If CIMCO supports 3D model import, load STL/STEP components for the machine body, column, spindle head, and pallet. Place each under the correct kinematic node so they move with the axes in simulation.</li>
+</ol>
+</div>
+
+<div class="section-title">Phase 5 — M-Code &amp; G-Code Configuration</div>
+<div class="card">
+<ol class="step-list">
+<li>Go to the <strong>M-Codes</strong> tab. Add Toyoda-specific M-codes that CIMCO must recognize and act on. At minimum configure:<br>
+  &bull; <span class="inline-code">M10</span> → Action: <em>Clamp rotary axis B</em><br>
+  &bull; <span class="inline-code">M11</span> → Action: <em>Unclamp rotary axis B</em><br>
+  &bull; <span class="inline-code">M06</span> → Action: <em>Tool change</em> (already present in most templates)<br>
+  &bull; <span class="inline-code">M19</span> → Action: <em>Spindle orient</em></li>
+<li>Go to the <strong>Tool Change</strong> tab. Set:<br>
+  &bull; Tool change position — typically G53 Z0 (Z machine home)<br>
+  &bull; ATC trigger: <span class="inline-code">M06</span><br>
+  &bull; Magazine size: <span class="inline-code">60</span></li>
+<li>In <strong>G-Code Groups</strong>, verify Group 1 (motion modes) includes G00, G01, G02, G03 and Group 14 (canned cycles) includes G73–G89.</li>
+<li>Save the machine definition. Click <strong>OK / Save</strong> and return to Machine Manager.</li>
+</ol>
+<div class="tip">CIMCO Edit stores machine definitions in: <span class="inline-code">C:\ProgramData\CIMCO\CIMCOEdit8\Machines\</span> — back up your .mch file after configuration.</div>
+</div>
+
+<div class="section-title">Phase 6 — Load Machine into Simulation</div>
+<div class="card">
+<ol class="step-list">
+<li>Open or create a test NC program in CIMCO Edit.</li>
+<li>Go to <span class="path">Machine Simulation → Simulate</span> (or press <strong>F5</strong>).</li>
+<li>In the simulation toolbar, click the <strong>Machine</strong> dropdown and select <span class="inline-code">TOYODA NH550SX</span>.</li>
+<li>Load a stock block: <span class="path">Stock → Define Stock</span> — set dimensions appropriate to your test program.</li>
+<li>Set the <strong>Work Offset</strong> origin (G54) relative to the stock. Drag the WCS indicator in the 3D view or enter coordinates manually.</li>
+<li>Press <strong>Play</strong> (or step through with <strong>F10</strong>). Confirm the B-axis rotates the table and X/Y/Z move the spindle.</li>
+</ol>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 3 — AXIS CONFIG REFERENCE
+══════════════════════════════════════════════════════════════ -->
+<div id="axis-config" class="content">
+<div class="section-title">CIMCO Axis Parameter Summary — NH550SX</div>
+<div class="grid">
+<div class="card">
+<h3><span class="ax-x">X</span> X-Axis (Column Left/Right)</h3>
+<table class="param-table">
+<tr><th>CIMCO Field</th><th>Value</th></tr>
+<tr><td>Axis Letter</td><td>X</td></tr>
+<tr><td>Type</td><td>Linear</td></tr>
+<tr><td>Positive Direction</td><td>Column moves left (tool moves right relative to part)</td></tr>
+<tr><td>Min Limit</td><td>-550 mm</td></tr>
+<tr><td>Max Limit</td><td>0 mm</td></tr>
+<tr><td>Rapid Rate</td><td>60,000 mm/min</td></tr>
+<tr><td>Home Position</td><td>0 (machine zero)</td></tr>
+<tr><td>Kinematic Node</td><td>Spindle side</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="ax-y">Y</span> Y-Axis (Spindle Up/Down)</h3>
+<table class="param-table">
+<tr><th>CIMCO Field</th><th>Value</th></tr>
+<tr><td>Axis Letter</td><td>Y</td></tr>
+<tr><td>Type</td><td>Linear</td></tr>
+<tr><td>Positive Direction</td><td>Spindle moves up</td></tr>
+<tr><td>Min Limit</td><td>0 mm</td></tr>
+<tr><td>Max Limit</td><td>600 mm</td></tr>
+<tr><td>Rapid Rate</td><td>60,000 mm/min</td></tr>
+<tr><td>Home Position</td><td>600 (top of travel)</td></tr>
+<tr><td>Kinematic Node</td><td>Spindle side</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="ax-z">Z</span> Z-Axis (Column In/Out)</h3>
+<table class="param-table">
+<tr><th>CIMCO Field</th><th>Value</th></tr>
+<tr><td>Axis Letter</td><td>Z</td></tr>
+<tr><td>Type</td><td>Linear</td></tr>
+<tr><td>Positive Direction</td><td>Column moves away from table (retract)</td></tr>
+<tr><td>Min Limit</td><td>-600 mm</td></tr>
+<tr><td>Max Limit</td><td>0 mm</td></tr>
+<tr><td>Rapid Rate</td><td>60,000 mm/min</td></tr>
+<tr><td>Home Position</td><td>0</td></tr>
+<tr><td>Kinematic Node</td><td>Spindle side</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="ax-b">B</span> B-Axis (Rotary Table — 4th Axis)</h3>
+<table class="param-table">
+<tr><th>CIMCO Field</th><th>Value</th></tr>
+<tr><td>Axis Letter</td><td>B</td></tr>
+<tr><td>Type</td><td>Rotary</td></tr>
+<tr><td>Rotation Axis</td><td>Y (rotates in XZ plane)</td></tr>
+<tr><td>Positive Direction</td><td>CCW viewed from +Y (above)</td></tr>
+<tr><td>Min Limit</td><td>-9999°</td></tr>
+<tr><td>Max Limit</td><td>9999°</td></tr>
+<tr><td>Rapid Rate</td><td>14,400 °/min (40 RPM)</td></tr>
+<tr><td>Home Position</td><td>0°</td></tr>
+<tr><td>Kinematic Node</td><td><strong>Workpiece/pallet side</strong></td></tr>
+<tr><td>Clamp M-code</td><td>M10</td></tr>
+<tr><td>Unclamp M-code</td><td>M11</td></tr>
+</table>
+<div class="warn">CIMCO Rotation Axis field: set to Y-axis. The B-axis pivot center must be defined at the exact center of the pallet table face.</div>
+</div>
+</div>
+
+<div class="section-title">Fanuc 31i-B5 Parameter Notes for CIMCO</div>
+<div class="grid">
+<div class="card">
+<h3>&#9881; Key Fanuc Parameters That Affect Simulation</h3>
+<table class="param-table">
+<tr><th>Fanuc Param #</th><th>Bit/Value</th><th>Effect</th></tr>
+<tr><td>1006</td><td>Bit 0 (ROT)</td><td>Declares B as rotary axis</td></tr>
+<tr><td>1006</td><td>Bit 1 (ROS)</td><td>Rollover at 360° (set to 1 for wrap)</td></tr>
+<tr><td>1260</td><td>= 360000</td><td>B-axis roll-over value (in 0.001° units)</td></tr>
+<tr><td>1820</td><td>= 1</td><td>Absolute B position display mode</td></tr>
+<tr><td>8136</td><td>Bit 0</td><td>4th axis (B) in synchronous interpolation</td></tr>
+<tr><td>5400</td><td>Bit 0 (NWZ)</td><td>Work coord system for B-axis</td></tr>
+</table>
+<div class="note">These Fanuc parameters define real machine behavior. CIMCO simulation abstracts them — set your CIMCO axis as Rotary + Rollover at 360° to replicate Fanuc param 1006 behavior.</div>
+</div>
+<div class="card">
+<h3>&#128295; B-Axis Pivot Point Setup in CIMCO</h3>
+<div class="code-block"><span class="cmt">( Determine B-axis pivot in CIMCO machine coordinates )</span>
+<span class="cmt">( The pallet face center is the correct pivot point )  </span>
+<span class="cmt">                                                        </span>
+<span class="cmt">( Typical NH550SX values — confirm on your machine: )   </span>
+  Pivot X = <span class="num">275.0</span>   <span class="cmt">( mid-travel of X axis )</span>
+  Pivot Y = <span class="num">0.0</span>     <span class="cmt">( table surface height )</span>
+  Pivot Z = <span class="num">300.0</span>   <span class="cmt">( mid-travel of Z axis )</span>
+
+<span class="cmt">( Set these as the Rotation Center in CIMCO B-axis )</span>
+<span class="cmt">( definition — labeled "Pivot" or "Center of Rotation" )</span></div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 4 — G-CODE REFERENCE
+══════════════════════════════════════════════════════════════ -->
+<div id="gcodes" class="content">
+<div class="section-title">G-Code Reference — Fanuc 31i-B5 (Toyoda NH550SX)</div>
+<div class="note">G-codes are grouped by modal group. Only one G-code per group can be active at a time. Group 00 = non-modal (one-shot).</div>
+
+<div class="section-title">Group 00 — Non-Modal (One-Shot)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G04</td><td>Dwell</td><td>G04 P1000 = 1 sec dwell; G04 X1.0 also valid</td></tr>
+<tr><td>G09</td><td>Exact stop check</td><td>In-block deceleration to zero before next block</td></tr>
+<tr><td>G10</td><td>Programmable data input</td><td>Write offsets/parameters from program</td></tr>
+<tr><td>G11</td><td>Cancel G10</td><td></td></tr>
+<tr><td>G28</td><td>Return to reference (home)</td><td>G91 G28 Z0 — always use incremental for safety</td></tr>
+<tr><td>G29</td><td>Return from reference</td><td>Moves through intermediate point set by G28</td></tr>
+<tr><td>G30</td><td>2nd/3rd/4th reference return</td><td>G30 P2 = 2nd ref, P3 = 3rd ref</td></tr>
+<tr><td>G31</td><td>Skip function (probing)</td><td>Stops on probe trigger; stores position in #5061–#5064</td></tr>
+<tr><td>G52</td><td>Local coordinate system</td><td>Shifts WCS locally; G52 X0 Y0 Z0 to cancel</td></tr>
+<tr><td>G53</td><td>Machine coordinate positioning</td><td>Non-modal; one block only; ignores all offsets</td></tr>
+<tr><td>G92</td><td>Coord system setting / speed clamp</td><td>G92 S5000 = max spindle clamp at 5000 RPM</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 01 — Motion Mode (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>NH550SX Notes</th></tr>
+<tr><td>G00</td><td>Rapid positioning</td><td>All 4 axes simultaneously; B at 14,400°/min max</td></tr>
+<tr><td>G01</td><td>Linear interpolation</td><td>Requires F word; can include B axis (G01 X_ B_ F_)</td></tr>
+<tr><td>G02</td><td>Circular interpolation CW</td><td>XY, ZX, or YZ plane (set by G17/18/19)</td></tr>
+<tr><td>G03</td><td>Circular interpolation CCW</td><td>Use R or I/J/K format</td></tr>
+<tr><td>G05.1 Q1</td><td>AI Advanced Preview ON</td><td>High-speed contour; enable before contour moves</td></tr>
+<tr><td>G05.1 Q0</td><td>AI Advanced Preview OFF</td><td>Cancel before tool change or end of program</td></tr>
+<tr><td>G07.1</td><td>Cylindrical interpolation</td><td>G07.1 B&lt;radius&gt;; unwraps B rotation to linear</td></tr>
+<tr><td>G12.1</td><td>Polar coordinate interpolation ON</td><td>Programs XY as radius/angle; for face milling on B</td></tr>
+<tr><td>G13.1</td><td>Polar coordinate interpolation OFF</td><td></td></tr>
+<tr><td>G33</td><td>Thread cutting</td><td>Synchronous spindle + feed</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 02 — Plane Selection (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Plane</th><th>Circular / Canned Notes</th></tr>
+<tr><td>G17</td><td>XY plane (default)</td><td>G02/G03 arcs in XY; canned cycles drill in Z</td></tr>
+<tr><td>G18</td><td>ZX plane</td><td>G02/G03 arcs in ZX; canned cycles drill in Y</td></tr>
+<tr><td>G19</td><td>YZ plane</td><td>G02/G03 arcs in YZ; canned cycles drill in X</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 03 — Absolute / Incremental (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G90</td><td>Absolute programming</td><td>All positions relative to WCS origin</td></tr>
+<tr><td>G91</td><td>Incremental programming</td><td>All positions relative to current position</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 06 — Unit Selection (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G20</td><td>Inch input</td><td>All linear values in inches; B-axis always in degrees</td></tr>
+<tr><td>G21</td><td>Metric input (default)</td><td>All linear values in mm; NH550SX native</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 07 — Cutter Radius Compensation (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G40</td><td>Cancel CRC</td><td>Must cancel before tool change</td></tr>
+<tr><td>G41</td><td>CRC left (climb milling)</td><td>Tool left of programmed path</td></tr>
+<tr><td>G42</td><td>CRC right (conventional)</td><td>Tool right of programmed path</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 08 — Tool Length Compensation (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G43</td><td>TLC positive (standard)</td><td>G43 H01 — use H word for offset register</td></tr>
+<tr><td>G44</td><td>TLC negative</td><td>Rarely used on NH550SX</td></tr>
+<tr><td>G49</td><td>Cancel TLC</td><td>Implicit with G28 on most setups</td></tr>
+</table>
+</div>
+
+<div class="section-title">Group 12 — Work Coordinate System (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G54</td><td>Work offset 1</td><td>Most common — pallet face side 1</td></tr>
+<tr><td>G55</td><td>Work offset 2</td><td>Side 2 (B90°)</td></tr>
+<tr><td>G56</td><td>Work offset 3</td><td>Side 3 (B180°)</td></tr>
+<tr><td>G57</td><td>Work offset 4</td><td>Side 4 (B270°)</td></tr>
+<tr><td>G58</td><td>Work offset 5</td><td>Fixture / additional</td></tr>
+<tr><td>G59</td><td>Work offset 6</td><td>Fixture / additional</td></tr>
+<tr><td>G54.1 P1–P48</td><td>Extended work offsets</td><td>48 additional WCS registers (P1–P48); requires option</td></tr>
+</table>
+<div class="tip">4-side machining pattern: use G54–G57 for B0/B90/B180/B270 faces. Set each WCS with the B-axis at its indexed position.</div>
+</div>
+
+<div class="section-title">Group 13 — Cutting Mode (Modal)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G61</td><td>Exact stop mode</td><td>Decelerates to zero between blocks</td></tr>
+<tr><td>G62</td><td>Automatic corner override</td><td>Reduces feed at inside corners automatically</td></tr>
+<tr><td>G63</td><td>Tapping mode</td><td>Override locked at 100%; use with G84</td></tr>
+<tr><td>G64</td><td>Cutting mode (default)</td><td>Smooth path; no deceleration between blocks</td></tr>
+</table>
+</div>
+
+<div class="section-title">Special / Option G-Codes</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>G65</td><td>Macro call</td><td>G65 P&lt;prog#&gt; A_ B_ ... — non-modal</td></tr>
+<tr><td>G66</td><td>Macro modal call</td><td>Calls macro at start of each subsequent block</td></tr>
+<tr><td>G67</td><td>Cancel G66</td><td></td></tr>
+<tr><td>G68</td><td>Coordinate rotation / 3D conversion</td><td>G68 X_ Y_ R_ (2D rotation); G68.2 for 5-axis TWP</td></tr>
+<tr><td>G69</td><td>Cancel G68</td><td></td></tr>
+<tr><td>G50</td><td>Cancel scaling</td><td></td></tr>
+<tr><td>G51</td><td>Scaling</td><td>G51 X_ Y_ Z_ P_ (P = scale factor ×1000)</td></tr>
+<tr><td>G50.1</td><td>Cancel mirror image</td><td></td></tr>
+<tr><td>G51.1</td><td>Mirror image</td><td>G51.1 X0 — mirror about X=0</td></tr>
+<tr><td>G93</td><td>Inverse time feed</td><td>F word = strokes/min; used in multi-axis moves</td></tr>
+<tr><td>G94</td><td>Feed per minute (default)</td><td>F in mm/min (or inch/min with G20)</td></tr>
+<tr><td>G95</td><td>Feed per revolution</td><td>F in mm/rev; requires active spindle speed</td></tr>
+<tr><td>G96</td><td>Constant surface speed</td><td>S = m/min (or ft/min with G20)</td></tr>
+<tr><td>G97</td><td>RPM mode (default)</td><td>S = direct RPM</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 5 — M-CODE REFERENCE
+══════════════════════════════════════════════════════════════ -->
+<div id="mcodes" class="content">
+<div class="section-title">M-Code Reference — Toyoda NH550SX (Fanuc 31i-B5)</div>
+<div class="note">M-codes marked ★ are Toyoda/machine-builder specific. All others are standard Fanuc. Verify against your machine's electrical manual before use.</div>
+
+<div class="section-title">Program Flow</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M00</td><td>Program stop (unconditional)</td><td>Spindle &amp; coolant stop; operator must cycle start</td></tr>
+<tr><td>M01</td><td>Optional stop</td><td>Only stops if optional stop switch is ON at control</td></tr>
+<tr><td>M02</td><td>Program end</td><td>Ends program; does NOT rewind</td></tr>
+<tr><td>M30</td><td>Program end and rewind</td><td>Rewinds to program start; standard end-of-program code</td></tr>
+<tr><td>M98</td><td>Subprogram call</td><td>M98 P&lt;prog#&gt; — optionally L&lt;repeat count&gt;</td></tr>
+<tr><td>M99</td><td>Subprogram return / rewind</td><td>In main: rewinds; in sub: returns to caller</td></tr>
+</table>
+</div>
+
+<div class="section-title">Spindle Control</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M03</td><td>Spindle CW (forward)</td><td>Requires S word: M03 S3000</td></tr>
+<tr><td>M04</td><td>Spindle CCW (reverse)</td><td>Requires S word; less common in milling</td></tr>
+<tr><td>M05</td><td>Spindle stop</td><td>Does not cancel coolant</td></tr>
+<tr><td>M19</td><td>Spindle orient</td><td>Orients to fixed angle for tool change or probing</td></tr>
+<tr><td>M29</td><td>Rigid tapping mode ★</td><td>Must precede G84; synchronizes spindle to feed</td></tr>
+</table>
+</div>
+
+<div class="section-title">Coolant Control</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M07</td><td>Mist coolant / air blast ON ★</td><td>Low-pressure air blast at spindle; check machine config</td></tr>
+<tr><td>M08</td><td>Flood coolant ON</td><td>Standard flood from nozzles around spindle</td></tr>
+<tr><td>M09</td><td>All coolant OFF</td><td>Cancels M07, M08, M50, M52</td></tr>
+<tr><td>M50</td><td>Through-spindle coolant ON ★</td><td>Standard pressure through-spindle (requires option)</td></tr>
+<tr><td>M51</td><td>Through-spindle coolant OFF ★</td><td></td></tr>
+<tr><td>M52</td><td>High-pressure through-spindle ON ★</td><td>High-pressure pump; max 70 bar typical</td></tr>
+<tr><td>M53</td><td>High-pressure through-spindle OFF ★</td><td></td></tr>
+</table>
+</div>
+
+<div class="section-title">4th Axis — B-Axis Clamp/Unclamp</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M10 ★</td><td>B-axis CLAMP</td><td>Engages hydraulic clamp — 4,000 N·m torque. Always clamp before cutting.</td></tr>
+<tr><td>M11 ★</td><td>B-axis UNCLAMP</td><td>Releases hydraulic clamp. Must unclamp before B-axis motion.</td></tr>
+</table>
+<div class="warn">NEVER move the B-axis without first issuing M11 (unclamp). NEVER cut with B-axis unclamped (M11 active). Violation causes alarm or mechanical damage.</div>
+<div class="code-block"><span class="cmt">( Standard 4th axis index sequence: )</span>
+<span class="m">M11</span>            <span class="cmt">( Unclamp B-axis )</span>
+<span class="g">G00</span> B<span class="num">90.0</span>    <span class="cmt">( Index to 90° )</span>
+<span class="m">M10</span>            <span class="cmt">( Clamp B-axis )</span>
+<span class="cmt">( ... cutting operations ... )</span>
+<span class="m">M11</span>            <span class="cmt">( Unclamp before next index )</span>
+<span class="g">G00</span> B<span class="num">180.0</span>   <span class="cmt">( Index to 180° )</span>
+<span class="m">M10</span>            <span class="cmt">( Clamp )</span></div>
+</div>
+
+<div class="section-title">Tool Change</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M06</td><td>Tool change (ATC)</td><td>Always preceded by T word; machine moves to TC position</td></tr>
+</table>
+<div class="code-block"><span class="cmt">( Standard tool change sequence on NH550SX: )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>        <span class="cmt">( Return Z to home first )</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>        <span class="cmt">( Return Y to home — required for ATC clearance )</span>
+T<span class="num">5</span>                 <span class="cmt">( Pre-select next tool in magazine )</span>
+<span class="m">M06</span>               <span class="cmt">( Execute tool change )</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">5</span>       <span class="cmt">( Apply TLC for new tool )</span></div>
+<div class="note">On the NH550SX the ATC arm-type changer requires Y at home for clearance. Omitting G28 Y0 before M06 will cause an alarm.</div>
+</div>
+
+<div class="section-title">Pallet Control (APC)</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M70 ★</td><td>Pallet change (APC cycle start)</td><td>Initiates automatic pallet exchange</td></tr>
+<tr><td>M71 ★</td><td>Pallet 1 select / call</td><td>Selects pallet 1 as next to be loaded</td></tr>
+<tr><td>M72 ★</td><td>Pallet 2 select / call</td><td>Selects pallet 2 as next to be loaded</td></tr>
+<tr><td>M73 ★</td><td>Pallet ready signal</td><td>Signals that workpiece setup on staging is complete</td></tr>
+<tr><td>M78 ★</td><td>Pallet clamp ON</td><td>Hydraulically clamps pallet to table</td></tr>
+<tr><td>M79 ★</td><td>Pallet unclamp</td><td>Releases pallet for APC exchange</td></tr>
+</table>
+</div>
+
+<div class="section-title">Chip &amp; Door Control</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M58 ★</td><td>Chip conveyor ON (forward)</td><td>Runs chip conveyor during program</td></tr>
+<tr><td>M59 ★</td><td>Chip conveyor OFF</td><td></td></tr>
+<tr><td>M60 ★</td><td>Chip conveyor reverse</td><td>Clear jams; use momentarily</td></tr>
+<tr><td>M64 ★</td><td>Automatic door OPEN</td><td>Opens enclosure door (if auto-door option fitted)</td></tr>
+<tr><td>M65 ★</td><td>Automatic door CLOSE</td><td></td></tr>
+</table>
+</div>
+
+<div class="section-title">Override &amp; Misc</div>
+<div class="card">
+<table class="param-table">
+<tr><th>M-Code</th><th>Function</th><th>Notes</th></tr>
+<tr><td>M48</td><td>Override cancel OFF</td><td>Re-enables feed/speed override dials</td></tr>
+<tr><td>M49</td><td>Override cancel ON</td><td>Locks feed &amp; speed overrides to 100% — use for tapping</td></tr>
+<tr><td>M13</td><td>Spindle CW + flood coolant ON</td><td>Combined M03 + M08 in one block</td></tr>
+<tr><td>M14</td><td>Spindle CCW + flood coolant ON</td><td>Combined M04 + M08</td></tr>
+<tr><td>M61 ★</td><td>Parts counter increment</td><td>Increments workpiece counter at end of cycle</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 6 — 4TH AXIS PROGRAMMING
+══════════════════════════════════════════════════════════════ -->
+<div id="4th-axis-prog" class="content">
+<div class="section-title">4th Axis (B-Axis) Programming Fundamentals</div>
+<div class="grid">
+<div class="card">
+<h3>&#9654; Basic 4-Side Indexing</h3>
+<div class="code-block"><span class="n">O0001</span>  <span class="cmt">( 4-SIDE MILLING — NH550SX B-AXIS )</span>
+<span class="g">G90</span> <span class="g">G21</span> <span class="g">G17</span> <span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>
+
+<span class="cmt">( TOOL 1 — FACE MILL )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+T<span class="num">1</span> <span class="m">M06</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">1</span> <span class="m">M03</span> S<span class="num">800</span>
+
+<span class="cmt">( SIDE 1 — B0° )</span>
+<span class="m">M11</span>                    <span class="cmt">( Unclamp B )</span>
+<span class="g">G00</span> B<span class="num">0</span>               <span class="cmt">( Index to 0° )</span>
+<span class="m">M10</span>                    <span class="cmt">( Clamp B )</span>
+<span class="g">G54</span>                    <span class="cmt">( Work offset for side 1 )</span>
+<span class="g">G00</span> X<span class="num">150.0</span> Y<span class="num">50.0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G01</span> Z<span class="num">-2.0</span> F<span class="num">500</span>
+<span class="g">G01</span> X<span class="num">-150.0</span> F<span class="num">2000</span>  <span class="cmt">( Face mill pass )</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+
+<span class="cmt">( SIDE 2 — B90° )</span>
+<span class="m">M11</span>                    <span class="cmt">( Unclamp B )</span>
+<span class="g">G00</span> B<span class="num">90.0</span>            <span class="cmt">( Index to 90° )</span>
+<span class="m">M10</span>                    <span class="cmt">( Clamp B )</span>
+<span class="g">G55</span>                    <span class="cmt">( Work offset for side 2 )</span>
+<span class="g">G00</span> X<span class="num">150.0</span> Y<span class="num">50.0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G01</span> Z<span class="num">-2.0</span> F<span class="num">500</span>
+<span class="g">G01</span> X<span class="num">-150.0</span> F<span class="num">2000</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+
+<span class="cmt">( SIDE 3 — B180° )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">180.0</span>
+<span class="m">M10</span>
+<span class="g">G56</span>
+<span class="cmt">( ... repeat machining ... )</span>
+
+<span class="cmt">( SIDE 4 — B270° )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">270.0</span>
+<span class="m">M10</span>
+<span class="g">G57</span>
+<span class="cmt">( ... repeat machining ... )</span>
+
+<span class="cmt">( RETURN HOME )</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="m">M30</span></div>
+</div>
+<div class="card">
+<h3>&#9654; Simultaneous 4-Axis Move (B + Linear)</h3>
+<div class="code-block"><span class="cmt">( Simultaneous B + Z — helical-style move )</span>
+<span class="cmt">( Part rotates while Z feeds — like a cam follower )</span>
+
+<span class="m">M11</span>              <span class="cmt">( Unclamp — required for interpolation )</span>
+<span class="g">G01</span> Z<span class="num">-50.0</span> B<span class="num">90.0</span> F<span class="num">300</span>
+<span class="cmt">( B rotates 90° as Z feeds 50mm — synchronized )</span>
+<span class="m">M10</span>              <span class="cmt">( Clamp after interpolation complete )</span>
+
+<span class="cmt">( NOTE: Do NOT clamp mid-interpolation. M10 must )</span>
+<span class="cmt">( come AFTER the G01 move block completes. )</span>
+
+<span class="cmt">( Inverse time feed for 4-axis moves (optional): )</span>
+<span class="g">G93</span>              <span class="cmt">( Inverse time feed mode )</span>
+<span class="g">G01</span> Z<span class="num">-50.0</span> B<span class="num">90.0</span> F<span class="num">3.5</span>  <span class="cmt">( F = moves/min )</span>
+<span class="g">G94</span>              <span class="cmt">( Return to feed/min mode )</span></div>
+<div class="note">Use G94 (feed per min) for indexed B-axis moves. Use G93 (inverse time) if your CAM post outputs multi-axis simultaneous paths with varying move lengths.</div>
+</div>
+</div>
+
+<div class="section-title">Cylindrical Interpolation — G07.1</div>
+<div class="grid">
+<div class="card">
+<h3>&#9654; G07.1 — Wrap Groove on Cylinder</h3>
+<div class="code-block"><span class="cmt">( Cylindrical interpolation — mills a groove on OD )</span>
+<span class="cmt">( Programs B-axis as linear axis (circumference) )   </span>
+<span class="cmt">( Radius must match part radius                   )   </span>
+
+<span class="g">G00</span> Z<span class="num">5.0</span>           <span class="cmt">( Clear Z before enabling G07.1 )</span>
+<span class="m">M11</span>                <span class="cmt">( Unclamp B )</span>
+<span class="g">G07.1</span> B<span class="num">75.0</span>       <span class="cmt">( Enable cyl interp; 75mm = part radius )</span>
+
+<span class="cmt">( Now B values are in mm (arc length), not degrees )</span>
+<span class="g">G90</span> <span class="g">G01</span> B<span class="num">0</span> Z<span class="num">0</span> F<span class="num">100</span>
+<span class="g">G01</span> B<span class="num">100.0</span> Z<span class="num">-30.0</span>  <span class="cmt">( Helical groove )</span>
+<span class="g">G01</span> B<span class="num">200.0</span> Z<span class="num">0</span>      <span class="cmt">( Return )</span>
+
+<span class="g">G07.1</span> B<span class="num">0</span>           <span class="cmt">( Cancel cylindrical interpolation )</span>
+<span class="m">M10</span>                <span class="cmt">( Clamp B )</span></div>
+<div class="note">G07.1 B&lt;radius&gt; activates cylindrical interpolation. Cancel with G07.1 B0. The B value in the enable block is the cylinder radius in mm, NOT a position.</div>
+</div>
+<div class="card">
+<h3>&#9654; G68 Coordinate Rotation with B-Axis</h3>
+<div class="code-block"><span class="cmt">( Use G68 to rotate work coordinate for angled features )</span>
+<span class="cmt">( without physically indexing the B-axis          )       </span>
+
+<span class="g">G54</span>
+<span class="g">G00</span> X<span class="num">0</span> Y<span class="num">0</span>
+
+<span class="cmt">( Rotate coordinate 45° around Z from X0 Y0: )          </span>
+<span class="g">G68</span> X<span class="num">0</span> Y<span class="num">0</span> R<span class="num">45.0</span>  <span class="cmt">( Activate rotation 45° )</span>
+
+<span class="g">G00</span> X<span class="num">50.0</span> Y<span class="num">0</span>      <span class="cmt">( Moves at 45° in machine )</span>
+<span class="g">G01</span> Z<span class="num">-10.0</span> F<span class="num">300</span>
+<span class="g">G00</span> Z<span class="num">5.0</span>
+
+<span class="g">G69</span>               <span class="cmt">( Cancel coordinate rotation )</span>
+
+<span class="cmt">( Use G68 for angled holes/slots; use B-axis index )    </span>
+<span class="cmt">( for true 4-face HMC setups — they are different. )    </span></div>
+</div>
+</div>
+
+<div class="section-title">Multi-Face Subprogram Pattern</div>
+<div class="card">
+<h3>&#9654; Main Program + Subprogram for 4-Side Machining</h3>
+<div class="two-col">
+<div>
+<div class="code-block"><span class="cmt">( MAIN PROGRAM — O0100 )</span>
+<span class="n">O0100</span>
+<span class="g">G90</span> <span class="g">G21</span> <span class="g">G17</span> <span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>
+
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+T<span class="num">1</span> <span class="m">M06</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">1</span> <span class="m">M03</span> S<span class="num">1200</span> <span class="m">M08</span>
+
+<span class="cmt">( FACE 1 — B0 )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="g">G54</span>
+<span class="m">M98</span> P<span class="num">0200</span>      <span class="cmt">( Call drill pattern sub )</span>
+
+<span class="cmt">( FACE 2 — B90 )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">90.0</span>
+<span class="m">M10</span>
+<span class="g">G55</span>
+<span class="m">M98</span> P<span class="num">0200</span>
+
+<span class="cmt">( FACE 3 — B180 )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">180.0</span>
+<span class="m">M10</span>
+<span class="g">G56</span>
+<span class="m">M98</span> P<span class="num">0200</span>
+
+<span class="cmt">( FACE 4 — B270 )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">270.0</span>
+<span class="m">M10</span>
+<span class="g">G57</span>
+<span class="m">M98</span> P<span class="num">0200</span>
+
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="m">M30</span></div>
+</div>
+<div>
+<div class="code-block"><span class="cmt">( DRILL PATTERN SUBPROGRAM — O0200 )</span>
+<span class="n">O0200</span>
+<span class="cmt">( Called from each face; WCS set in main )</span>
+
+<span class="g">G00</span> X<span class="num">50.0</span> Y<span class="num">50.0</span>
+<span class="g">G00</span> Z<span class="num">5.0</span>
+
+<span class="g">G81</span> X<span class="num">50.0</span> Y<span class="num">50.0</span> <span class="cmt">\</span>
+    Z<span class="num">-20.0</span> R<span class="num">2.0</span> F<span class="num">150</span>
+X<span class="num">100.0</span>
+X<span class="num">150.0</span>
+X<span class="num">50.0</span>  Y<span class="num">100.0</span>
+X<span class="num">100.0</span>
+X<span class="num">150.0</span>
+<span class="g">G80</span>
+
+<span class="g">G00</span> Z<span class="num">50.0</span>
+<span class="m">M99</span>              <span class="cmt">( Return to main program )</span></div>
+<div class="tip">Using a subprogram for the repeating operation means any edit to the drilling pattern automatically applies to all 4 faces. Change once, update all sides.</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 7 — CANNED CYCLES
+══════════════════════════════════════════════════════════════ -->
+<div id="canned-cycles" class="content">
+<div class="section-title">Canned Cycles — Fanuc 31i-B5 (NH550SX)</div>
+<div class="note">After indexing the B-axis and clamping (M10), standard canned cycles work identically to a 3-axis program. G17 (XY plane / Z drill direction) is the default on this machine.</div>
+<div class="card">
+<table class="param-table">
+<tr><th>G-Code</th><th>Cycle</th><th>Action at Bottom</th><th>Retract</th></tr>
+<tr><td>G73</td><td>High-speed peck drill</td><td>Intermittent peck with chip break (no full retract)</td><td>R or initial</td></tr>
+<tr><td>G74</td><td>CCW tapping (left-hand)</td><td>Dwell, spindle CW, retract</td><td>R or initial</td></tr>
+<tr><td>G76</td><td>Fine boring</td><td>Spindle orient → shift → retract clean</td><td>R or initial</td></tr>
+<tr><td>G80</td><td>Cancel canned cycle</td><td>—</td><td>—</td></tr>
+<tr><td>G81</td><td>Spot drill / drill</td><td>No dwell, immediate retract</td><td>R or initial</td></tr>
+<tr><td>G82</td><td>Counterbore / spot face</td><td>Dwell (P)</td><td>R or initial</td></tr>
+<tr><td>G83</td><td>Deep hole peck drill</td><td>Intermittent peck with full retract to R</td><td>R or initial</td></tr>
+<tr><td>G84</td><td>RH tapping (with M29)</td><td>Dwell, spindle CCW, retract at feed</td><td>R or initial</td></tr>
+<tr><td>G85</td><td>Bore (feed in / feed out)</td><td>Retract at cutting feed</td><td>R or initial</td></tr>
+<tr><td>G86</td><td>Bore (feed in / rapid out)</td><td>Spindle stop → rapid out</td><td>R or initial</td></tr>
+<tr><td>G87</td><td>Back bore</td><td>Shift → rapid up → bore → shift → retract</td><td>Initial only</td></tr>
+<tr><td>G88</td><td>Bore with dwell + manual</td><td>Dwell → spindle stop → manual retract</td><td>Manual</td></tr>
+<tr><td>G89</td><td>Bore with dwell</td><td>Dwell → feed retract</td><td>R or initial</td></tr>
+</table>
+</div>
+
+<div class="section-title">Canned Cycle Arguments</div>
+<div class="card">
+<table class="param-table">
+<tr><th>Address</th><th>Meaning</th><th>Notes</th></tr>
+<tr><td>X, Y</td><td>Hole position (XY plane)</td><td>Can be repeated on subsequent lines without restating G-code</td></tr>
+<tr><td>Z</td><td>Hole bottom depth</td><td>Absolute from WCS Z0 (in G90 mode)</td></tr>
+<tr><td>R</td><td>R-plane height</td><td>Clearance above hole; rapid down to R, then feed to Z</td></tr>
+<tr><td>Q</td><td>Peck depth increment</td><td>G73/G83 only; must be positive</td></tr>
+<tr><td>P</td><td>Dwell time (ms)</td><td>G82/G89: P1000 = 1 second dwell</td></tr>
+<tr><td>F</td><td>Feed rate</td><td>mm/min (G94) or mm/rev (G95)</td></tr>
+<tr><td>L</td><td>Repeat count</td><td>G91 mode; drills L holes at X/Y increment each time</td></tr>
+<tr><td>G98</td><td>Return to initial plane</td><td>Retracts to Z height at start of cycle</td></tr>
+<tr><td>G99</td><td>Return to R-plane</td><td>Stays at R between holes; faster for multiple holes</td></tr>
+</table>
+</div>
+
+<div class="section-title">Rigid Tapping (G84 + M29)</div>
+<div class="card">
+<h3>&#9654; M29 Rigid Tapping — Correct Sequence</h3>
+<div class="code-block"><span class="cmt">( RIGID TAPPING — M8x1.25 thread, 20mm deep )</span>
+<span class="cmt">( Feed = Pitch × RPM = 1.25 × 800 = 1000 mm/min )</span>
+
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+T<span class="num">5</span> <span class="m">M06</span>             <span class="cmt">( Load M8 tap )</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">5</span>
+
+<span class="m">M29</span> S<span class="num">800</span>          <span class="cmt">( Rigid tapping mode — set speed here )</span>
+<span class="m">M49</span>               <span class="cmt">( Lock override at 100% )</span>
+<span class="g">G54</span>
+<span class="g">G00</span> X<span class="num">50.0</span> Y<span class="num">50.0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+
+<span class="g">G84</span> X<span class="num">50.0</span> Y<span class="num">50.0</span> Z<span class="num">-20.0</span> R<span class="num">2.0</span> P<span class="num">200</span> F<span class="num">1000</span>
+X<span class="num">100.0</span>
+X<span class="num">150.0</span>
+<span class="g">G80</span>
+
+<span class="m">M48</span>               <span class="cmt">( Restore override )</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+<span class="m">M05</span></div>
+<div class="warn">M29 MUST appear before G84 and after the S word. Omitting M29 uses standard (non-rigid) tapping which will strip threads on a rigid machine spindle.</div>
+</div>
+
+<div class="section-title">Canned Cycles After B-Axis Index</div>
+<div class="card">
+<h3>&#9654; Drilling on 4th-Axis Face (Complete Pattern)</h3>
+<div class="code-block"><span class="cmt">( Drill bolt circle on B90° face — Side 2 )</span>
+
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+T<span class="num">3</span> <span class="m">M06</span>             <span class="cmt">( Drill tool )</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">3</span> <span class="m">M03</span> S<span class="num">2500</span> <span class="m">M08</span>
+
+<span class="cmt">( Index B to 90° )</span>
+<span class="m">M11</span>               <span class="cmt">( Unclamp )</span>
+<span class="g">G00</span> B<span class="num">90.0</span>
+<span class="m">M10</span>               <span class="cmt">( Clamp — must be clamped before drilling )</span>
+
+<span class="g">G55</span>               <span class="cmt">( WCS for B90 face )</span>
+<span class="g">G17</span>               <span class="cmt">( XY plane — Z is drill direction )</span>
+
+<span class="g">G99</span> <span class="g">G81</span> X<span class="num">0</span> Y<span class="num">50.0</span> Z<span class="num">-25.0</span> R<span class="num">3.0</span> F<span class="num">180</span>
+<span class="cmt">( Bolt circle 6 holes, 50mm radius, 60° apart )</span>
+X<span class="num">43.301</span>  Y<span class="num">25.0</span>
+X<span class="num">43.301</span>  Y<span class="num">-25.0</span>
+X<span class="num">0</span>        Y<span class="num">-50.0</span>
+X<span class="num">-43.301</span> Y<span class="num">-25.0</span>
+X<span class="num">-43.301</span> Y<span class="num">25.0</span>
+<span class="g">G80</span>
+
+<span class="g">G00</span> Z<span class="num">50.0</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M30</span></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB 8 — VERIFY SIMULATION
+══════════════════════════════════════════════════════════════ -->
+<div id="verify" class="content">
+<div class="section-title">Simulation Verification Checklist</div>
+<div class="grid">
+<div class="card">
+<h3>&#9989; CIMCO Simulation Checks</h3>
+<table class="param-table">
+<tr><th>#</th><th>Check</th><th>Expected Result</th></tr>
+<tr><td>1</td><td>Load machine in simulation</td><td>NH550SX appears in machine dropdown; no errors on load</td></tr>
+<tr><td>2</td><td>G28 Z0 moves Z to home</td><td>Z-axis retracts to machine zero (column back)</td></tr>
+<tr><td>3</td><td>G28 B0 after M11</td><td>B-axis returns to 0°; TABLE rotates (not spindle)</td></tr>
+<tr><td>4</td><td>G00 B90.0</td><td>Table rotates 90° CCW viewed from above</td></tr>
+<tr><td>5</td><td>M10 / M11 recognized</td><td>No "unknown M-code" warning; clamp state changes</td></tr>
+<tr><td>6</td><td>G54 / G55 / G56 / G57</td><td>WCS origin shifts correctly for each face</td></tr>
+<tr><td>7</td><td>G01 X_ B_ F_ block</td><td>X and B move simultaneously in simulation path</td></tr>
+<tr><td>8</td><td>M06 tool change</td><td>Tool changes in ATC; tool model updates in 3D view</td></tr>
+<tr><td>9</td><td>G83 peck cycle</td><td>Chip removal path visible; correct depth and R-plane</td></tr>
+<tr><td>10</td><td>Collision check</td><td>No tool/holder collision on rapid moves; B-indexed faces clear</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>&#127881; Test Program — Smoke Test for Simulation</h3>
+<div class="code-block"><span class="cmt">( CIMCO SMOKE TEST — TOYODA NH550SX )</span>
+<span class="cmt">( Run this first to validate all axes )  </span>
+<span class="n">O9999</span>
+<span class="g">G90</span> <span class="g">G21</span> <span class="g">G17</span> <span class="g">G40</span> <span class="g">G49</span> <span class="g">G80</span>
+
+<span class="cmt">( 1. Verify home / tool change )</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="g">G91</span> <span class="g">G28</span> Y<span class="num">0</span>
+T<span class="num">1</span> <span class="m">M06</span>
+<span class="g">G90</span> <span class="g">G43</span> H<span class="num">1</span>
+
+<span class="cmt">( 2. Verify B-axis index B0 )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">0</span>
+<span class="m">M10</span>
+
+<span class="cmt">( 3. Move in XYZ with G54 )</span>
+<span class="g">G54</span>
+<span class="m">M03</span> S<span class="num">1000</span>
+<span class="g">G00</span> X<span class="num">0</span> Y<span class="num">0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G01</span> Z<span class="num">0</span> F<span class="num">300</span>
+<span class="g">G01</span> X<span class="num">100.0</span> F<span class="num">2000</span>
+<span class="g">G01</span> Y<span class="num">100.0</span>
+<span class="g">G01</span> X<span class="num">0</span>
+<span class="g">G01</span> Y<span class="num">0</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+
+<span class="cmt">( 4. B90 index — verify face change )</span>
+<span class="m">M11</span>
+<span class="g">G00</span> B<span class="num">90.0</span>
+<span class="m">M10</span>
+<span class="g">G55</span>
+<span class="g">G00</span> X<span class="num">0</span> Y<span class="num">0</span>
+<span class="g">G43</span> Z<span class="num">5.0</span>
+<span class="g">G81</span> X<span class="num">0</span> Y<span class="num">0</span> Z<span class="num">-10.0</span> R<span class="num">2.0</span> F<span class="num">120</span>
+<span class="g">G80</span>
+<span class="g">G00</span> Z<span class="num">50.0</span>
+
+<span class="cmt">( 5. Simultaneous B + Z interpolation )</span>
+<span class="m">M11</span>
+<span class="g">G01</span> B<span class="num">180.0</span> Z<span class="num">-20.0</span> F<span class="num">500</span>
+<span class="m">M10</span>
+
+<span class="cmt">( 6. Return home )</span>
+<span class="m">M05</span> <span class="m">M09</span>
+<span class="g">G91</span> <span class="g">G28</span> Z<span class="num">0</span>
+<span class="m">M11</span>
+<span class="g">G91</span> <span class="g">G28</span> B<span class="num">0</span>
+<span class="m">M10</span>
+<span class="m">M30</span></div>
+</div>
+</div>
+
+<div class="section-title">Common CIMCO Simulation Errors &amp; Fixes</div>
+<div class="card">
+<table class="param-table">
+<tr><th>Error / Symptom</th><th>Cause</th><th>Fix</th></tr>
+<tr><td>B-axis rotates spindle head instead of table</td><td>B-axis node on wrong side of kinematic chain</td><td>Move B-axis node to workpiece/pallet side in Kinematics tab</td></tr>
+<tr><td>"Unknown M-code M10" warning</td><td>M10/M11 not defined in machine M-code table</td><td>Add M10 → Clamp Rotary B and M11 → Unclamp Rotary B in M-Codes tab</td></tr>
+<tr><td>Simulation shows B at wrong angle</td><td>B home position mismatch</td><td>Set B home = 0 in axis definition; check machine reference position</td></tr>
+<tr><td>WCS origin wrong after B index</td><td>G55/G56 offsets not set relative to each face</td><td>Set G55 X/Y/Z offsets assuming B=90° is the reference (use G10 in program or enter manually)</td></tr>
+<tr><td>Tool change alarm in sim (Z/Y not at home)</td><td>G28 Y0 not called before M06</td><td>Add G91 G28 Y0 before every T/M06 block</td></tr>
+<tr><td>Canned cycle Z depth wrong on side faces</td><td>Plane selection G17 but machining in Z direction is actually X on side face</td><td>Use G18 (ZX plane) or G19 (YZ plane) when drilling on B90/B270 if tool approaches from X or Y direction</td></tr>
+<tr><td>M29 rigid tap not recognized</td><td>Controller type not set to Fanuc 31i in CIMCO</td><td>Set Machine → Control → Fanuc 31i; enable Rigid Tapping option</td></tr>
+</table>
+</div>
+
+<div class="section-title">B-Axis Rotation Direction Convention</div>
+<div class="card">
+<div class="two-col">
+<div>
+<div class="code-block"><span class="cmt">( NH550SX B-axis positive direction: )
+( CCW when viewed from ABOVE (+Y)   )
+(                                    )
+(         B90 (Left face)            )
+(              |                     )
+(   B180 ------+------ B0 (Front)   )
+(              |                     )
+(         B270 (Right face)          )
+(                                    )
+( B0   = pallet T-slots face +Z     )
+( B90  = pallet T-slots face +X     )
+( B180 = pallet T-slots face -Z     )
+( B270 = pallet T-slots face -X     )
+(                                    )
+( Shortest path indexing:            )
+( B0 → B270 = -90° (CW) is shorter  )
+( than B0 → B90 → B180 → B270      )
+( Fanuc uses shortest path by default)</span></div>
+</div>
+<div>
+<div class="tip">In CIMCO simulation, confirm the rotation arrow on the B-axis 3D model matches your machine. If the 3D rotation is opposite to physical machine, negate the B-axis direction in the axis definition or toggle the "Reverse" checkbox.</div>
+<div class="note">For programs using only 90° index positions, always use absolute B values (G90): B0, B90, B180, B270. Avoid incremental (G91) for indexed positions — absolute prevents accumulated error and is easier to verify in simulation.</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
