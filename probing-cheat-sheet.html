@@ -66,6 +66,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 <div class="tab" onclick="showTab('tool-diam')">&#9004; Tool Diameter</div>
 <div class="tab" onclick="showTab('offset-write')">&#128221; Offset Writing</div>
 <div class="tab" onclick="showTab('ipi')">&#128200; In-Process</div>
+<div class="tab" onclick="showTab('feed-speed')">&#9881; Feed &amp; Speed — 13-8</div>
 </div>
 <!-- TAB: PROBE SETUP -->
 <div id="probe-setup" class="content active">
@@ -369,3 +370,93 @@ body{font-family:'Segoe UI',sans-serif;background:#0d1117;color:#c9d1d9;min-heig
 </div>
 </div>
 </div>
+<!-- TAB: FEED & SPEED — 13-8 STAINLESS -->
+<div id="feed-speed" class="content">
+<div class="section-title">Feed &amp; Speed — 13-8 PH Stainless | 1&quot; Carbide Bull Nose | Adaptive Milling</div>
+<div class="grid">
+<div class="card">
+<h3><span class="icon">&#9881;</span>Tool Reference — KOR6RA1000R300SLR060C</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Diameter</td><td>1.000&quot;</td></tr>
+<tr><td>Corner Radius</td><td>0.300&quot; (bull nose)</td></tr>
+<tr><td>Flutes</td><td>6</td></tr>
+<tr><td>Tool Type</td><td>Solid Carbide Bull Nose EM</td></tr>
+<tr><td>Material</td><td>13-8 PH Stainless (S13800)</td></tr>
+<tr><td>Strategy</td><td>Pillar / Adaptive (MX2412)</td></tr>
+</table>
+</div>
+<div class="card">
+<h3><span class="icon">&#128200;</span>Chip Thinning — Why Low Feed Causes Chipping</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Value</th></tr>
+<tr><td>Stepover (ae)</td><td>7% = 0.070&quot;</td></tr>
+<tr><td>Chip Thinning Factor</td><td>&radic;(ae/D) = &radic;(0.07) = <strong>0.2646</strong></td></tr>
+<tr><td>Actual chip = programmed &times;</td><td>0.2646</td></tr>
+</table>
+<div class="warn">At 45 IPM / 2000 RPM / 6 flutes: actual chip = 0.00375 &times; 0.2646 = <strong>0.001&quot;/tooth</strong> — tool is RUBBING, not cutting. Rubbing causes heat &rarr; work hardening &rarr; chipping on hardened 13-8 surface.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128203;</span>Feed &amp; Speed — Recommended vs Current</h3>
+<table class="param-table">
+<tr><th>Parameter</th><th>Previous (chipping)</th><th>Recommended</th></tr>
+<tr><td>SFM</td><td>523</td><td><strong>450–475</strong></td></tr>
+<tr><td>RPM</td><td>2000</td><td><strong>1718–1814</strong></td></tr>
+<tr><td>Feed (IPM)</td><td>45</td><td><strong>100–115</strong></td></tr>
+<tr><td>Stepover</td><td>7%</td><td>Keep 7%</td></tr>
+<tr><td>ADOC</td><td>0.195&quot;</td><td>Keep 0.195&quot;</td></tr>
+<tr><td>Actual chip/tooth</td><td>~0.001&quot; (rubbing)</td><td><strong>0.0025–0.003&quot;</strong></td></tr>
+</table>
+<div class="tip">Start at 100 IPM / 1800 RPM. Confirm no chipping before increasing. Once cutting clean, can push feed toward 115 IPM or SFM back toward 500.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#9654;</span>Chip Thinning Formula — Adaptive Milling</h3>
+<div class="code-block"><span class="cmt">( CHIP THINNING — RADIAL ENGAGEMENT )</span>
+
+<span class="cmt">CTF = SQRT(ae / D)</span>
+<span class="cmt">    ae = radial stepover (inches)</span>
+<span class="cmt">    D  = tool diameter (inches)</span>
+
+<span class="cmt">Actual chip load = (IPM / (flutes x RPM)) x CTF</span>
+
+<span class="cmt">Required IPM for target actual chip load:</span>
+<span class="cmt">  IPM = (target_chip / CTF) x flutes x RPM</span>
+
+<span class="cmt">--- EXAMPLE (7% stepover, 1" dia, 6 fl) ---</span>
+<span class="cmt">CTF  = SQRT(0.07) = 0.2646</span>
+<span class="cmt">Target actual = 0.0025"/tooth</span>
+<span class="cmt">Prog chip = 0.0025 / 0.2646 = 0.00945"/tooth</span>
+<span class="cmt">IPM = 0.00945 x 6 x 1800 = 102 IPM</span></div>
+</div>
+<div class="card">
+<h3><span class="icon">&#9888;</span>13-8 Stainless — Machining Notes</h3>
+<div class="warn">13-8 PH work-hardens rapidly. Never allow rubbing — always maintain minimum 0.002&quot; actual chip load. If the tool dwells or feed drops, the surface hardens and the next pass chips the tool.</div>
+<div class="note">Heat treat condition matters: H950 (~44 HRC) is very aggressive. H1000 (~40 HRC) is most common. H1150 (~28 HRC) is softer. Reduce SFM by ~10% per condition step toward H950.</div>
+<div class="tip">Climb cut only (set). Use flood coolant or high-pressure through-spindle if available. If no coolant, reduce SFM to 400 and keep feed up. Never let chips re-cut — 13-8 chips are work-hardened.</div>
+</div>
+<div class="card">
+<h3><span class="icon">&#128295;</span>MX2412 Toolpath Settings Reference</h3>
+<table class="param-table">
+<tr><th>Setting</th><th>Value</th></tr>
+<tr><td>Strategy</td><td>Pillar cutting, continue adaptive</td></tr>
+<tr><td>Stepover</td><td>7.00% of flat</td></tr>
+<tr><td>Min curvature radius</td><td>10% tool</td></tr>
+<tr><td>Low height transfer</td><td>150% tool (1.5&quot;)</td></tr>
+<tr><td>Cut direction</td><td>Climb cut</td></tr>
+<tr><td>Cut order</td><td>Level first</td></tr>
+<tr><td>Cut level</td><td>Constant</td></tr>
+<tr><td>ADOC</td><td>0.1950&quot;</td></tr>
+</table>
+</div>
+</div>
+</div>
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
