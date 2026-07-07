@@ -41,12 +41,26 @@ date. That is how this file earns its trust.
 ### 2. Kennametal  🟡
 - **Advisor:** **NOVO** "Tool Advisor" (rules engine). ⚠ **Login-walled JS app** — not reachable without the user's account.
 - **Intake:** machining feature (shoulder/pocket/slot/face…) → feature req → sequence (rough/finish) → material (ANSI/ISO / KMT master #). Outputs speeds & feeds report.
+- **Indexable END-MILL families (sweep ALL of these — don't stop at the first hit):**
+  Mill 1-10 · **Mill 1-14** · **Mill 4-11** (4-edge double-sided, shoulder — very common) ·
+  Mill 4-15 · KOR (high-feed) · KSSM/KSSR shell mills. Each family comes in
+  **Weldon, screw-on, AND cylindrical-shank** styles, and several in **long-length**
+  versions. If the job specifies OAL/reach or a cylindrical shank, search the
+  family's **cylindrical-shank + long-length** variant by name — that's where the
+  5" OAL / shrink-fit configs live.
 - **Catalog PDFs (best-retrievable, distributor-hosted):**
   - Face mills master: `productivity.com/wp-content/uploads/pdfs/Kennametal%20Facemills%20-%20Master%20Catalog.pdf`
   - Milling 6050: `productivity.com/wp-content/uploads/pdfs/Kennametal%20Milling%20Catalog%206050.pdf`
   - Solid carbide end mill inch master (2023): `productivity.com/wp-content/uploads/2022/08/Kennametal-2023-Solid-Carbide-End-Milling-Inch-Master-Catalog-Interactive.pdf`
   - Speeds/feeds (MSC): `www1.mscdirect.com/images/solutions/kennametal/endMillSpeedFeed.pdf`, `.../millingTechInfoFormulas.pdf`
 - **Worked example (real numbers):** AISI 4140 @220 HB → **Vc = 450 SFM, fz = 0.008 IPT** (table is by material class, not per part#). Part# example: KSSM8+ shell mill order `5420150` (`KSSM87D200SN440S075Z05`).
+- **Mill 4-11 part-number GRAMMAR** (decode/validate/construct a config):
+  `M4 · D<dia×100> · L11 · <#inserts, 2-digit> · <shank: C=cyl / W=Weldon / A=screw-on><dia×100> · L<OAL×100>`
+  Example ✅ `M4D125L1105C100L500` = Mill 4-11, **1.25" dia**, LN11 inserts, **5 inserts**,
+  **cylindrical 1.00" shank**, **5.00" OAL** (2.25" shank len). Matches a 1.25"/5"-OAL/
+  shrink-fit ask perfectly. [Kennametal Mill 4-11 family](https://www.kennametal.com/us/en/products/metalworking-tools/milling/indexable-milling/shoulder-mills/mill-4-11.html)
+  → **Lesson:** learn each brand's part-number grammar so you can recognize a valid
+  config, validate a number a rep gives, and search for the exact variant a spec implies.
 
 ### 3. Iscar  🟢  *(richest structured data)*
 - **Advisor:** **ITA / NEO-ITA** (no login to browse). Returns up to 25 ranked tools each with Vc, fz/fn, ap, ae, spindle power, MRR, cutting time. Calculators: `iscar.com/ITC/Calculators.aspx?units=M`. Materials web service: `iscar.com/wsMaterials/service.asmx` (SOAP).

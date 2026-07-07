@@ -45,11 +45,25 @@ style that implies it), skip that question.
 ## STEP 2 — Find the tool (see `brands.md` for per-brand sources)
 
 1. Map operation + material → tool family + ISO grade.
-2. Search the relevant brands. **Prefer the catalog PDF** — download it, then
-   read the exact part-number row and its published cutting data.
-3. Website looks stale / part not listed → hunt the current catalog PDF; it is
-   usually more up to date on inventory and part numbers.
-4. Collect: primary pick + 1–2 alternates from different brands.
+2. **Family sweep — don't stop at the first hit.** For each candidate brand,
+   enumerate its relevant tool *families* (see `brands.md`, e.g. Kennametal Mill
+   1-10 / 1-14 / 4-11 / 4-15 / KOR) and pick within them. The first SKU search
+   returns is rarely the best fit.
+3. **Resolve EVERY hard constraint explicitly.** If I gave a number — diameter,
+   **OAL / reach / stickout**, shank type, corner radius — search for the variant
+   that meets it by name. OAL/reach given → search the family's **"long-length" /
+   "extended reach" / "cylindrical shank"** variant (that's where 5"-OAL / shrink-fit
+   configs live). Never settle for a standard-length SKU when a longer one is asked for.
+4. **Shank ↔ holder consistency check.** If you recommend shrink-fit or hydraulic
+   holding, the tool needs a **cylindrical** shank — so find a cylindrical-shank
+   body, not a Weldon one. Catch your own contradictions before presenting.
+5. **Prefer the catalog PDF / product page** for the exact part-number row and its
+   published cutting data. Stale site / part not listed → hunt the current PDF.
+6. **If I give you a part number, decode & validate it** against the brand's
+   part-number grammar in `brands.md` — confirm it meets the spec (dia, OAL, shank),
+   and learn the grammar if it's not logged yet.
+7. Collect: primary pick + 1–2 alternates from different brands. Note if a
+   recommended part is discontinued/long-lead.
 
 ---
 
