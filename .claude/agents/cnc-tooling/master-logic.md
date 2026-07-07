@@ -55,6 +55,9 @@ style that implies it), skip that question.
 
 ## STEP 3 — Compute cutting data (show your work)
 
+> **Default units: inch / SFM / IPT.** Convert from whatever the source PDF uses.
+> Only switch to metric if I ask.
+
 Given manufacturer Vc (SFM) and fz (IPT):
 ```
 RPM      = (Vc_SFM × 3.82) / D_inch          # metric: RPM = Vc_m/min × 1000 / (π × D_mm)

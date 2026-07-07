@@ -19,8 +19,14 @@ date. That is how this file earns its trust.
 | Tier | Brands | Why |
 |---|---|---|
 | 🟢 Easiest | **Guhring**, **Iscar** | Guhring = public HTML speeds/feeds tables at predictable URLs. Iscar = server-rendered `.aspx` E-CAT + patterned catalog PDFs. |
-| 🟡 Medium | **Harvey/Helical**, **Kyocera/SGS**, **OSG**, **Mitsubishi**, **Kennametal** | Static catalog / S&F PDFs (some on distributor mirrors). Harvey PDFs need a page→PDF hash resolve. |
-| 🔴 Hardest | **Sandvik**, **Walter**, **Seco**, **Emuge** | Data locked in JS apps / logins. Use the ISO 13399 API (Sandvik) or PDF-parse only. |
+| 🟡 Medium | **Harvey/Helical**, **Kyocera/SGS**, **OSG**, **Mitsubishi**, **Kennametal**, **Tungaloy**, **YG-1** | Static catalog / S&F PDFs (some on distributor mirrors). Harvey PDFs need a page→PDF hash resolve. |
+| 🔴 Hardest | **Sandvik**, **Walter**, **Seco** | Data locked in JS apps / logins. Use the ISO 13399 API (Sandvik) or PDF-parse only. |
+
+> **Units:** default output is **inch / SFM / IPT**. Convert from whatever the
+> source PDF uses; only switch to metric if the user asks.
+> **Threading note:** Emuge-Franken was dropped from the general-milling 12 — it
+> is the go-to only for **taps / thread-milling**. If a thread-milling job comes
+> up, consult Emuge separately (`emuge-franken-group.com/us/en/brochures`).
 
 ---
 
@@ -73,18 +79,18 @@ date. That is how this file earns its trust.
 - **Advisor:** Milling Performance Optimizer (endmillcalc).
 - **Public HTML speeds/feeds tables (predictable URLs):** `guhring.com/SpeedsAndFeeds/SpeedFeed/ToolChart?toolType=Milling+Cutters`; hub `guhring.com/Support/Speeds-Feeds-Charts`; catalogs `guhring.com/Catalog`.
 
-### 10. Emuge-Franken  🔴  *(really a THREADING pick)*
-- **Advisor:** EF-Cutting Data app. Data embedded in large catalog PDFs (510/520). US brochures: `emuge-franken-group.com/us/en/brochures/a/Brochures`.
-- Note: strongest for taps/thread-milling; narrower for general milling.
-
-### 11. Harvey Tool / Helical Solutions  🟡  *(US machinist favorite)*
+### 10. Harvey Tool / Helical Solutions  🟡  *(US machinist favorite)*
 - **Advisor:** **Machining Advisor Pro (MAP)** `map.harveyperformance.com` (covers both). Inputs: Tool# → Material(type/subgroup/condition, hardness auto) → Operation (slot/rough/HEM/finish) → Machine (max rpm/ipm, holder, workholding) + stickout/axial/radial DOC. ⚠ **Free login required**, no public API.
 - **Per-tool S&F:** product pages `harveytool.com/products/tool-details-<num>` / `helicaltool.com/products/tool-details-<num>` (JS app). Real S&F PDFs on **Widen DAM** `harveyperformance.widen.net/content/<hash>/pdf/SF_<series>.pdf` — hash is opaque, resolve from the product page. PDFs are per-family.
 - **Worked examples:** Harvey `#907122` (metric mini square EM); Helical `#45249/#59890` HEV-5 (5-flute variable helix, to 65 HRC). 6061 ≈ 800–1500 SFM, ~0.002–0.004 IPT (starting). Distributor fallbacks with plain HTML + part#s: `dgisupply.com`, `mscdirect.com`.
 
-### 12. Tungaloy  🟡  *(12th slot — indexable-milling specialist)*
+### 11. Tungaloy  🟡  *(indexable-milling specialist)*
 - Real US entity (Tungaloy-NTK America). Strong high-feed/face/shoulder indexable line. Milling landing `tungaloy.com/us/products/milling/`.
-- **Alt for slot 12:** **YG-1** (`yg1usa.com`) if you'd rather a high-volume solid-endmill brand. **WIDIA** is skipped (it's Kennametal's sub-brand — overlaps #2).
+- Advisor: Tungaloy has cutting-condition tables in its milling catalog PDFs; parse those. WIDIA is intentionally excluded (it's Kennametal's sub-brand — overlaps #2).
+
+### 12. YG-1  🟡  *(high-volume solid end mills)*
+- World's largest carbide round-tool maker; US ops in Vernon Hills, IL. Site `yg1usa.com`.
+- Advisor: speeds/feeds published in product catalogs (X-Power, i-Xmill, etc.). Parse the catalog PDFs; good value/solid-endmill coverage complementing Harvey/Helical.
 
 ---
 
