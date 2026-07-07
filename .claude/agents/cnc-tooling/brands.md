@@ -115,3 +115,11 @@ machine with normal internet access. Strategy per site:
 - Kennametal Mill 1-14 Weldon inch: M1D125E1404W125L225 · order 2479506 · 1.25" dia, 1.25" Weldon (kennametal.com). Insert family EDCT-E.GD; stainless grade KC725M.
 - Sandvik Silent Tools milling adapters: damped, rated for overhang 4–14× coupling dia; the go-to for 4"+ reach in tough material (sandvik.coromant.com/.../silent-tools-milling).
 - Cutting-data anchor: Machining Doctor 17-4PH page — base milling Vc 330–440 SFM @28 HRC; multiply ×0.69 for 43 HRC → ~228–304 SFM. Coarse pitch + light ap advised for PH.
+
+<!-- 2026-07-07 (run 2) · CORRECTIONS confirmed via WebSearch · 13-8PH ~45HRC 1.25" indexable shoulder mill -->
+- CORRECTION to run-1 note: RA390-032M32-**17M** takes size-**17** inserts (R390-17xx), NOT the R390-11 insert. R390-11 fits the -11H body only. Do not mix.
+- RA390-032M32-17M · order 5740189 · CONFIRMED: 1.25" dia, 1.25" Weldon, **Z=3 inserts (close pitch)**, through-coolant, OAL 4.001", max ap 0.618"/15.7mm (MSC 54965421, Penn Tool, Source Atlantic, Sandvik).
+- Correct insert for -17M in stainless/PH: **R390-170408M-PM grade 1130** · order **6971850** · AlTiCrN Zertivo, ISO M/P, PM medium chipbreaker, corner rad 0.031" (DGI Supply SVK6971850, ScottDirect, Amazon). GS4130 HRSA grade also exists in R390-11 size for tougher/hardened PH.
+- Iscar HM90 E90A-D1.25-5-W1.00 · Iscar order **3101941** (Travers 19-242-206) · 1.25" dia, 1.0" Weldon, Z=5, OAL 3.74". Insert HM90 APKT 1003PDR grade IC808 confirmed widely available (denser 5-insert pitch = more heat in PH; coarse Sandvik 3-insert preferred for tough PH).
+- Kennametal Mill 1-14 body M1D125E1404W125L225 · order 2479506 · flagged "no longer available / long lead" on kennametal.com — demote to last alternate. Inserts EDCT-E.GD, stainless grade KCSM40 (e.g. EC1408EGD 6171518 / EC1416EGD 6171520).
+- No manufacturer-published Vc/fz for 13-8PH (S13800) @45HRC found via search. Web anchors only: 17-4PH reduce to 120-180 SFM @higher hardness (tirapid); stainless fz 0.002-0.006 IPT, keep chipload >0.001-0.0015" to avoid work-hardening/rubbing (cncoptimization). Estimate used: Vc 150 SFM, fz 0.004 IPT → LOW confidence, verify with test cut.
