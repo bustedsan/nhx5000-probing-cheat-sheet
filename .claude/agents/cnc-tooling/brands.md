@@ -105,3 +105,13 @@ machine with normal internet access. Strategy per site:
 
 ## LOG (append per live run: ✅ confirmed URL · date · what the table looked like)
 <!-- e.g. 2026-07-08 ✅ guhring milling ToolChart returns clean HTML table, cols: dia, SFM, IPT by material -->
+
+<!-- 2026-07-07 · via WebSearch (fetch/curl blocked in sandbox) · PH-stainless 1.25" indexable shoulder mill run -->
+- Sandvik CoroMill 390 Weldon-shank 1.25" bodies (confirmed dims via distributor listings):
+  - RA390-032M32-17M · order 5740189 · 1.25" dia, 1.25" Weldon, size-17 insert, max ap 0.618" (Source Atlantic / Groves).
+  - RA390-032M32-45L (LONG EDGE) · order 5740192 · 1.25" dia, 1.25" Weldon, OAL 4.66", max ap 1.77", uses R390-11 long-edge inserts (Groves Industrial SAN 5740192).
+  - Insert R390-11T308M-PM found in grade 1130 (MSC 54733282) and grade 1030 "steel/stainless" (cuttingtoolpickers). -PM = medium chipbreaker.
+- Iscar HELIMILL: HM90 E90A D1.25-5-W1.00 · 1.25" dia, 5 inserts, 1.00" Weldon, OAL 3.74" (Penn Tool). Uses HM90 APKT 1003PDR. Grade IC808 order 5606393 (TiAlN, ISO M/S/H — good for PH stainless).
+- Kennametal Mill 1-14 Weldon inch: M1D125E1404W125L225 · order 2479506 · 1.25" dia, 1.25" Weldon (kennametal.com). Insert family EDCT-E.GD; stainless grade KC725M.
+- Sandvik Silent Tools milling adapters: damped, rated for overhang 4–14× coupling dia; the go-to for 4"+ reach in tough material (sandvik.coromant.com/.../silent-tools-milling).
+- Cutting-data anchor: Machining Doctor 17-4PH page — base milling Vc 330–440 SFM @28 HRC; multiply ×0.69 for 43 HRC → ~228–304 SFM. Coarse pitch + light ap advised for PH.
