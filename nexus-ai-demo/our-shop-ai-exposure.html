@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Exposure — Our Shop Roles</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --fg: #e0e0e8;
+    --fg2: #888894;
+    --line: #22222c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 40px 28px 56px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.5px; }
+  .sub { color: var(--fg2); font-size: 15px; line-height: 1.5; margin: 0 0 4px; max-width: 760px; }
+  .attrib { color: var(--fg2); font-size: 13px; margin: 14px 0 28px; max-width: 760px; }
+  .attrib a { color: #7aa2ff; text-decoration: none; }
+  .rows { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 210px 54px 1fr; align-items: center;
+    gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .role { font-size: 17px; font-weight: 600; }
+  .role .kind { display: block; font-size: 12px; font-weight: 400; color: var(--fg2); margin-top: 2px; }
+  .score { font-size: 26px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .score span { font-size: 13px; color: var(--fg2); font-weight: 400; }
+  .barwrap { position: relative; }
+  .bartrack { height: 30px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+  .bar { height: 100%; border-radius: 4px; }
+  .why { font-size: 13px; color: var(--fg2); line-height: 1.45; margin-top: 8px; }
+  .legend { display: flex; align-items: center; gap: 10px; margin: 24px 0 8px; font-size: 12px; color: var(--fg2); }
+  .legend .grad { flex: 0 0 200px; height: 8px; border-radius: 2px;
+    background: linear-gradient(90deg, rgb(30,180,40), rgb(230,160,20), rgb(255,30,15)); }
+  .land { margin-top: 40px; padding: 22px 24px; background: var(--bg2); border-radius: 8px;
+    border-left: 3px solid #7aa2ff; }
+  .land .big { font-size: 20px; font-weight: 700; line-height: 1.4; }
+  .land .small { font-size: 13px; color: var(--fg2); margin-top: 10px; line-height: 1.5; }
+  .caveat { font-size: 12px; color: var(--fg2); margin-top: 26px; line-height: 1.5; max-width: 760px;
+    border-top: 1px solid var(--line); padding-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Where AI Hits Our Shop</h1>
+  <p class="sub">Digital AI Exposure, scored 0&ndash;10, for the roles in this room. The logic is
+    simple: the more a job&rsquo;s work product is a <b>digital file</b> made at a screen &mdash; a model, a
+    drawing, a program, an analysis &mdash; the higher the exposure. The more a job is <b>hands-on in the
+    real world</b>, the lower it scores.</p>
+  <p class="attrib">Scoring rubric and physical-vs-digital logic from Andrej Karpathy&rsquo;s
+    <a href="https://karpathy.ai/jobs/">US Job Market Visualizer</a> (he ran AI at Tesla and co-founded
+    OpenAI), applied here to our specific aerospace/defense machine-shop roles.</p>
+
+  <div class="legend">
+    <span>Lower exposure (hands-on)</span>
+    <span class="grad"></span>
+    <span>Higher exposure (digital)</span>
+  </div>
+
+  <div class="rows" id="rows"></div>
+
+  <div class="land">
+    <div class="big">AI is not going to replace engineers. Engineers who use AI are going to replace
+      the ones who don&rsquo;t.</div>
+    <div class="small">A high score does <b>not</b> mean the job disappears &mdash; it means the job
+      changes. Software developers score 9 and that field is still projected to grow. Exposure means
+      <b>reshaped, not replaced</b>. The knowledge in this room &mdash; why a 13-8 part fails, what a probe
+      cycle should feel like, a good setup from a scrap part &mdash; is exactly what makes these tools
+      powerful in <em>our</em> hands.</div>
+  </div>
+
+  <p class="caveat">These are rough, defensible estimates calibrated to the same 0&ndash;10 anchors
+    Karpathy uses (roofer/diver 0&ndash;1; electrician/plumber 2&ndash;3; nurse/police 4&ndash;5;
+    teacher/accountant 6&ndash;7; software developer/drafter 8&ndash;9; data-entry clerk 10). They do not
+    account for demand, regulation, or preference for human workers &mdash; they estimate how much AI will
+    <em>reshape</em> the work, not whether the job goes away.</p>
+</div>
+
+<script>
+// Karpathy's exact green->red color scale (from site/index.html), reused for palette continuity.
+function boostContrast(t){ const c=(t-0.5)*2; const b=Math.sign(c)*Math.pow(Math.abs(c),0.55); return b/2+0.5; }
+function greenRedCSS(t, alpha){
+  t = boostContrast(Math.max(0, Math.min(1, t)));
+  let r,g,b;
+  if (t < 0.5){ const s=t/0.5; r=Math.round(30+s*200); g=Math.round(180-s*20); b=Math.round(40-s*20); }
+  else { const s=(t-0.5)/0.5; r=Math.round(230+s*25); g=Math.round(160-s*130); b=Math.round(20-s*5); }
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+function exposureColor(v, a){ return greenRedCSS(v/10, a); }
+
+const ROLES = [
+  { role: "CAD drafter",           kind: "model &amp; drawing at the screen", score: 9,
+    why: "The work product is a pure digital file &mdash; models, drawings, GD&amp;T. AI already generates and checks these. Highest exposure in the room." },
+  { role: "CNC programmer",        kind: "G-code / CAM toolpaths",           score: 8,
+    why: "You turn knowledge into a digital file. AI-assisted CAM and feature recognition target exactly this &mdash; held below a 9 only by the real proveout: exotic alloys, fixturing, probing, tuning at the control." },
+  { role: "Manufacturing engineer", kind: "process plans, fixtures, DFM",    score: 7,
+    why: "Mostly digital deliverables AI can draft &mdash; process plans, tolerance analysis, work instructions &mdash; anchored by heavy shop-floor presence and cross-functional judgment." },
+  { role: "CMM programmer",        kind: "offline inspection routines",       score: 7,
+    why: "Inspection programs authored offline from the CAD model (PC-DMIS / Calypso) &mdash; digital and automatable &mdash; but coupled to physical metrology setup and datum proveout." },
+  { role: "Quality inspector",     kind: "gauges, first-article, docs",       score: 5,
+    why: "A real mix: hands-on measurement and part handling, plus digital documentation AI can assist. Physical presence keeps it mid-scale." },
+  { role: "Machinist / operator",  kind: "running the spindle",              score: 3,
+    why: "Hands-on the machine &mdash; setup, tool changes, offsets, deburr, reading the cut. Physical, real-world, unpredictable. One of the safest jobs on the board." },
+  { role: "Assembler",             kind: "fit, torque, precision assembly",   score: 2,
+    why: "Almost entirely physical and manual. Lowest exposure &mdash; today&rsquo;s AI, which is digital, barely touches it." },
+];
+
+const rowsEl = document.getElementById("rows");
+for (const r of ROLES){
+  const div = document.createElement("div");
+  div.className = "row";
+  const pct = (r.score / 10) * 100;
+  const col = exposureColor(r.score, 1);
+  div.innerHTML =
+    `<div class="role">${r.role}<span class="kind">${r.kind}</span></div>` +
+    `<div class="score" style="color:${col}">${r.score}<span>/10</span></div>` +
+    `<div class="barwrap">` +
+      `<div class="bartrack"><div class="bar" style="width:${pct}%;background:${col}"></div></div>` +
+      `<div class="why">${r.why}</div>` +
+    `</div>`;
+  rowsEl.appendChild(div);
+}
+</script>
+</body>
+</html>
